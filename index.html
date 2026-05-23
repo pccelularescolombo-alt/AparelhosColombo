@@ -4,174 +4,887 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Cadastro de Aparelhos</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
-    * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
-    body { margin: 0; background: #f3f4f6; color: #111827; }
-    header { background: #111827; color: white; padding: 12px; text-align: center; }
-    header h1 { margin: 0; font-size: 22px; }
-    header p { margin: 4px 0 0; font-size: 13px; }
+    :root {
+      --bg: #F6F7FB;
+      --surface: #FFFFFF;
+      --surface-2: #F9FAFC;
+      --border: #E5E8F0;
+      --border-strong: #D6DAE5;
+      --text: #0F172A;
+      --text-muted: #64748B;
+      --text-soft: #94A3B8;
 
-    .container { width: 98%; max-width: 1600px; margin: 14px auto; padding: 0 6px; }
-    .card { background: white; border-radius: 10px; padding: 12px; box-shadow: 0 3px 10px rgba(0,0,0,0.08); margin-bottom: 14px; }
-    .card h2 { margin: 0 0 10px 0; font-size: 18px; }
+      --primary: #0F172A;
+      --primary-hover: #1E293B;
+      --accent: #4F46E5;
+      --accent-hover: #4338CA;
+      --accent-soft: #EEF2FF;
 
-    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap; }
-    .tab-btn { background: #e5e7eb; color: #111827; }
-    .tab-btn.active { background: #111827; color: white; }
-    .tab-content { display: none; }
+      --success: #059669;
+      --success-soft: #D1FAE5;
+      --warning: #D97706;
+      --warning-soft: #FEF3C7;
+      --danger: #DC2626;
+      --danger-soft: #FEE2E2;
+      --info: #0284C7;
+      --info-soft: #E0F2FE;
+      --purple: #7C3AED;
+      --purple-soft: #EDE9FE;
+
+      --shadow-sm: 0 1px 2px rgba(15, 23, 42, 0.04), 0 1px 3px rgba(15, 23, 42, 0.06);
+      --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.06), 0 2px 4px -2px rgba(15, 23, 42, 0.04);
+      --shadow-lg: 0 10px 25px -5px rgba(15, 23, 42, 0.08), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+      --shadow-xl: 0 25px 50px -12px rgba(15, 23, 42, 0.18);
+
+      --radius-sm: 6px;
+      --radius: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 20px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Manrope', system-ui, -apple-system, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ===================== TOPBAR ===================== */
+    .topbar {
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      backdrop-filter: blur(8px);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, #0F172A 0%, #4F46E5 100%);
+      display: grid;
+      place-items: center;
+      color: white;
+      font-size: 16px;
+      box-shadow: var(--shadow-md);
+    }
+
+    .brand-title {
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      color: var(--text);
+    }
+
+    .brand-sub {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .topbar-right {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .store-pill {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .store-pill:hover {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .store-pill i { color: var(--accent); font-size: 12px; }
+
+    /* ===================== CONTAINER ===================== */
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px 28px 60px;
+    }
+
+    /* ===================== STATS ===================== */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 14px;
+      margin-bottom: 20px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px 18px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+      border-color: var(--border-strong);
+    }
+
+    .stat-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+    .stat-icon.blue { background: var(--info-soft); color: var(--info); }
+    .stat-icon.green { background: var(--success-soft); color: var(--success); }
+    .stat-icon.orange { background: var(--warning-soft); color: var(--warning); }
+    .stat-icon.purple { background: var(--purple-soft); color: var(--purple); }
+
+    .stat-info { display: flex; flex-direction: column; gap: 2px; }
+    .stat-label { font-size: 12px; color: var(--text-muted); font-weight: 600; letter-spacing: 0.02em; text-transform: uppercase; }
+    .stat-value { font-size: 24px; font-weight: 800; color: var(--text); font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
+
+    /* ===================== TABS ===================== */
+    .tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 18px;
+      background: var(--surface);
+      padding: 5px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      width: fit-content;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .tab-btn {
+      background: transparent;
+      color: var(--text-muted);
+      padding: 9px 18px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.18s ease;
+      font-family: inherit;
+    }
+    .tab-btn:hover { color: var(--text); background: var(--surface-2); }
+    .tab-btn.active { background: var(--primary); color: white; box-shadow: var(--shadow-sm); }
+    .tab-btn i { font-size: 12px; }
+
+    .tab-content { display: none; animation: fadeIn 0.25s ease; }
     .tab-content.active { display: block; }
 
-    .form-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
-    label { font-size: 12px; font-weight: bold; display: block; margin-bottom: 3px; }
-    input, select, textarea { width: 100%; padding: 7px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; }
-    textarea { min-height: 48px; resize: vertical; }
-    .full { grid-column: span 2; }
-    .full-row { grid-column: 1 / -1; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-    button { border: none; padding: 8px 10px; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 12px; }
-    .btn-primary { background: #111827; color: white; }
-    .btn-secondary { background: #2563eb; color: white; }
-    .btn-danger { background: #dc2626; color: white; }
-    .btn-copy { background: #16a34a; color: white; }
-    .btn-warning { background: #f59e0b; color: white; }
-    .btn-purple { background: #7c3aed; color: white; }
-    .actions { margin-top: 10px; display: flex; gap: 8px; flex-wrap: wrap; }
+    /* ===================== CARD ===================== */
+    .card {
+      background: var(--surface);
+      border-radius: var(--radius-lg);
+      border: 1px solid var(--border);
+      padding: 20px;
+      margin-bottom: 18px;
+      box-shadow: var(--shadow-sm);
+    }
 
-    .table-wrapper { overflow-x: auto; background: white; }
-    table { width: 100%; border-collapse: collapse; background: white; min-width: 1250px; }
-    th { background: #111827; color: white; padding: 6px; font-size: 12px; border: 1px solid #374151; text-align: left; white-space: nowrap; }
-    td { padding: 5px; border: 1px solid #d1d5db; font-size: 12px; vertical-align: top; }
-    tr:nth-child(even) { background: #f9fafb; }
-    .empty { text-align: center; color: #6b7280; padding: 16px; }
-    .acao-botoes { display: flex; gap: 5px; flex-wrap: wrap; min-width: 250px; }
-    .status { font-weight: bold; border-radius: 999px; padding: 3px 7px; display: inline-block; font-size: 11px; }
-    .status-disponivel { background: #dbeafe; color: #1e40af; }
-    .status-vendido { background: #dcfce7; color: #166534; }
-    .status-transferido { background: #fef3c7; color: #92400e; }
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
 
-    .cabecalho-print { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; gap: 10px; }
-    .cabecalho-print h3 { margin: 0; font-size: 22px; }
-    .cabecalho-print p { margin: 0; font-size: 13px; font-weight: bold; }
+    .card-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+      margin: 0;
+    }
 
-    .historico-filtros { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; align-items: end; margin-bottom: 10px; }
-    .relatorio-box { background: #f9fafb; border: 1px dashed #9ca3af; border-radius: 8px; padding: 10px; white-space: pre-line; font-size: 13px; line-height: 1.4; margin-top: 10px; max-height: 260px; overflow: auto; }
+    .card-title i {
+      color: var(--accent);
+      font-size: 14px;
+    }
 
-    .hide-for-png { display: none !important; }
+    .card-subtitle {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 2px;
+    }
 
+    /* ===================== FORM ===================== */
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 14px;
+    }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+    .field label .req { color: var(--danger); margin-left: 2px; }
+
+    input, select, textarea {
+      width: 100%;
+      padding: 9px 12px;
+      border: 1px solid var(--border-strong);
+      border-radius: 8px;
+      font-size: 13px;
+      font-family: inherit;
+      background: var(--surface);
+      color: var(--text);
+      transition: all 0.15s ease;
+      outline: none;
+    }
+
+    input:hover, select:hover, textarea:hover { border-color: #B8BFD0; }
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.12);
+    }
+    input::placeholder, textarea::placeholder { color: var(--text-soft); }
+
+    textarea { min-height: 64px; resize: vertical; }
+
+    .field.full { grid-column: span 2; }
+    .field.full-row { grid-column: 1 / -1; }
+
+    .input-icon {
+      position: relative;
+    }
+    .input-icon i {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-soft);
+      font-size: 13px;
+      pointer-events: none;
+    }
+    .input-icon input { padding-left: 36px; }
+
+    /* ===================== BUTTONS ===================== */
+    button {
+      border: none;
+      padding: 9px 16px;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 13px;
+      cursor: pointer;
+      font-family: inherit;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: all 0.15s ease;
+      white-space: nowrap;
+    }
+    button:active { transform: translateY(1px); }
+    button i { font-size: 12px; }
+
+    .btn-primary { background: var(--primary); color: white; }
+    .btn-primary:hover { background: var(--primary-hover); box-shadow: var(--shadow-md); }
+
+    .btn-accent { background: var(--accent); color: white; }
+    .btn-accent:hover { background: var(--accent-hover); box-shadow: var(--shadow-md); }
+
+    .btn-secondary { background: var(--info); color: white; }
+    .btn-secondary:hover { background: #0369A1; box-shadow: var(--shadow-md); }
+
+    .btn-danger { background: var(--danger); color: white; }
+    .btn-danger:hover { background: #B91C1C; box-shadow: var(--shadow-md); }
+
+    .btn-copy { background: var(--success); color: white; }
+    .btn-copy:hover { background: #047857; box-shadow: var(--shadow-md); }
+
+    .btn-warning { background: var(--warning); color: white; }
+    .btn-warning:hover { background: #B45309; box-shadow: var(--shadow-md); }
+
+    .btn-purple { background: var(--purple); color: white; }
+    .btn-purple:hover { background: #6D28D9; box-shadow: var(--shadow-md); }
+
+    .btn-ghost {
+      background: var(--surface);
+      color: var(--text);
+      border: 1px solid var(--border-strong);
+    }
+    .btn-ghost:hover { background: var(--surface-2); border-color: var(--text-soft); }
+
+    .btn-icon {
+      padding: 7px 9px;
+      border-radius: 7px;
+      font-size: 12px;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+
+    /* ===================== SEARCH BAR ===================== */
+    .table-toolbar {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 220px;
+      max-width: 360px;
+    }
+    .search-box i {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-soft);
+      font-size: 13px;
+    }
+    .search-box input {
+      padding-left: 38px;
+      background: var(--surface-2);
+      border-radius: 999px;
+    }
+
+    .filter-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-chip:hover { color: var(--text); border-color: var(--border-strong); }
+    .filter-chip.active {
+      background: var(--accent-soft);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    /* ===================== TABLE ===================== */
+    .table-wrapper {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      background: var(--surface);
+      min-width: 1250px;
+    }
+
+    th {
+      background: var(--surface-2);
+      color: var(--text-muted);
+      padding: 11px 12px;
+      font-size: 11px;
+      font-weight: 700;
+      text-align: left;
+      white-space: nowrap;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      padding: 12px;
+      font-size: 13px;
+      vertical-align: middle;
+      border-bottom: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    tbody tr { transition: background 0.12s ease; }
+    tbody tr:hover { background: var(--surface-2); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .empty {
+      text-align: center;
+      color: var(--text-soft);
+      padding: 48px 16px;
+      font-size: 13px;
+    }
+    .empty i { font-size: 32px; display: block; margin-bottom: 10px; opacity: 0.4; }
+
+    .acao-botoes {
+      display: flex;
+      gap: 4px;
+      flex-wrap: nowrap;
+    }
+
+    .category-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 9px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+    }
+    .cat-novo { background: #DCFCE7; color: #15803D; }
+    .cat-vitrine { background: #DBEAFE; color: #1D4ED8; }
+    .cat-semi { background: #FEF3C7; color: #B45309; }
+    .cat-outlet { background: #FCE7F3; color: #BE185D; }
+    .cat-uso { background: #E0E7FF; color: #4338CA; }
+    .cat-rastreio { background: #FEE2E2; color: #B91C1C; }
+
+    .price-cell {
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 600;
+      font-size: 12.5px;
+      color: var(--text);
+    }
+    .price-cell.muted { color: var(--text-soft); font-weight: 500; }
+
+    .imei-cell {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-muted);
+    }
+
+    .nfc-yes { color: var(--success); font-weight: 700; }
+    .nfc-no { color: var(--text-soft); font-weight: 500; }
+
+    /* ===================== PRINT HEADER ===================== */
+    .print-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 18px;
+      padding-bottom: 16px;
+      border-bottom: 2px solid var(--border);
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .print-header h3 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: var(--text);
+    }
+    .print-header .sub {
+      margin: 4px 0 0;
+      font-size: 12px;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ===================== HISTORICO ===================== */
+    .historico-filtros {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr) auto auto auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+
+    .relatorio-box {
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      white-space: pre-line;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      line-height: 1.6;
+      max-height: 460px;
+      overflow: auto;
+      color: var(--text);
+    }
+    .relatorio-box.empty-state {
+      text-align: center;
+      color: var(--text-soft);
+      padding: 40px;
+      font-family: 'Manrope', sans-serif;
+    }
+    .relatorio-box.empty-state i { font-size: 28px; display: block; margin-bottom: 8px; opacity: 0.4; }
+
+    /* ===================== OVERLAY / PAINEL ===================== */
     .overlay {
       display: none;
       position: fixed;
       inset: 0;
-      background: rgba(0,0,0,0.45);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
       z-index: 50;
+      animation: fadeOverlay 0.2s ease;
     }
-
     .overlay.active { display: block; }
+    @keyframes fadeOverlay { from { opacity: 0; } to { opacity: 1; } }
 
     .painel-venda {
       position: fixed;
       top: 0;
-      right: -430px;
-      width: 420px;
+      right: -460px;
+      width: 440px;
       max-width: 95vw;
       height: 100vh;
-      background: white;
+      background: var(--surface);
       z-index: 60;
-      box-shadow: -4px 0 14px rgba(0,0,0,0.22);
-      padding: 16px;
-      transition: right 0.25s ease;
+      box-shadow: -20px 0 50px rgba(15, 23, 42, 0.2);
+      padding: 28px;
+      transition: right 0.3s cubic-bezier(0.16, 1, 0.3, 1);
       overflow-y: auto;
     }
-
     .painel-venda.active { right: 0; }
-    .painel-venda h2 { margin: 0 0 12px 0; }
-    .painel-venda .campo { margin-bottom: 10px; }
 
-    .modal-preview {
+    .painel-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 22px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid var(--border);
+    }
+    .painel-header h2 {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .painel-header h2 i { color: var(--accent); }
+    .painel-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: var(--surface-2);
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      padding: 0;
+      display: grid;
+      place-items: center;
+      cursor: pointer;
+    }
+    .painel-close:hover { background: var(--danger-soft); color: var(--danger); border-color: var(--danger-soft); }
+
+    .painel-venda .campo { margin-bottom: 14px; }
+    .painel-venda .campo label {
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    .painel-actions {
+      display: flex;
+      gap: 10px;
+      padding-top: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: 18px;
+    }
+    .painel-actions button { flex: 1; justify-content: center; }
+
+    /* ===================== MODAL ===================== */
+    .modal-preview, .modal-setup {
       display: none;
       position: fixed;
       inset: 0;
       z-index: 70;
-      background: rgba(0,0,0,0.55);
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
       align-items: center;
       justify-content: center;
       padding: 16px;
+      animation: fadeOverlay 0.2s ease;
     }
-
-    .modal-preview.active { display: flex; }
+    .modal-preview.active, .modal-setup.active { display: flex; }
 
     .modal-content {
-      background: white;
+      background: var(--surface);
       width: 560px;
       max-width: 96vw;
-      border-radius: 12px;
-      padding: 16px;
-      box-shadow: 0 10px 24px rgba(0,0,0,0.28);
+      border-radius: var(--radius-xl);
+      padding: 28px;
+      box-shadow: var(--shadow-xl);
+      animation: modalIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: scale(0.96) translateY(8px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-content h2 {
+      margin: 0 0 6px 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-content h2 i { color: var(--accent); }
+    .modal-content p.modal-desc {
+      margin: 0 0 18px 0;
+      color: var(--text-muted);
+      font-size: 13px;
     }
 
     .preview-texto {
-      background: #f9fafb;
-      border: 1px dashed #9ca3af;
-      border-radius: 8px;
-      padding: 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
       white-space: pre-line;
-      line-height: 1.5;
-      font-size: 14px;
-      max-height: 360px;
+      line-height: 1.6;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      max-height: 400px;
       overflow: auto;
-      margin: 12px 0;
+      margin: 14px 0;
     }
 
-    @media (max-width: 1000px) {
-      .form-grid, .historico-filtros { grid-template-columns: repeat(2, 1fr); }
-      .full, .full-row { grid-column: 1 / -1; }
+    /* ===================== TOAST ===================== */
+    .toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
     }
 
-    @media (max-width: 600px) {
+    .toast {
+      background: var(--primary);
+      color: white;
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: var(--shadow-xl);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      min-width: 240px;
+      max-width: 380px;
+      animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      pointer-events: auto;
+    }
+    .toast.success { background: var(--success); }
+    .toast.error { background: var(--danger); }
+    .toast.warning { background: var(--warning); }
+    .toast.info { background: var(--info); }
+    .toast i { font-size: 16px; }
+    .toast.removing { animation: toastOut 0.25s ease forwards; }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+    @keyframes toastOut {
+      to { opacity: 0; transform: translateX(40px); }
+    }
+
+    /* ===================== UTIL ===================== */
+    .hide-for-png { display: none !important; }
+    .hidden { display: none !important; }
+
+    /* ===================== RESPONSIVE ===================== */
+    @media (max-width: 1100px) {
+      .form-grid { grid-template-columns: repeat(3, 1fr); }
+      .historico-filtros { grid-template-columns: repeat(3, 1fr); }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .field.full { grid-column: span 1; }
+    }
+
+    @media (max-width: 700px) {
+      .topbar { padding: 12px 16px; }
+      .container { padding: 16px 14px 60px; }
       .form-grid, .historico-filtros { grid-template-columns: 1fr; }
-      .container { width: 100%; padding: 0 4px; }
+      .field.full, .field.full-row { grid-column: 1 / -1; }
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .brand-sub { display: none; }
+      .stat-value { font-size: 20px; }
     }
+
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 999px; border: 2px solid var(--bg); }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-soft); }
   </style>
 </head>
 <body>
-  <header>
-    <h1>Cadastro de Aparelhos</h1>
-    <p>Controle de aparelhos, vendas, transferências e histórico</p>
+
+  <!-- ===================== TOPBAR ===================== -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon"><i class="fa-solid fa-mobile-screen-button"></i></div>
+      <div>
+        <div class="brand-title" id="brandTitle">Cadastro de Aparelhos</div>
+        <div class="brand-sub">Controle de aparelhos, vendas, transferências e histórico</div>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <button class="store-pill" type="button" onclick="abrirModalLoja()" data-testid="btn-config-loja">
+        <i class="fa-solid fa-store"></i>
+        <span id="nomeLojaPill">Configurar loja</span>
+        <i class="fa-solid fa-pen" style="font-size: 10px; opacity: 0.6;"></i>
+      </button>
+    </div>
   </header>
 
   <main class="container">
-    <div class="tabs">
-      <button class="tab-btn active" type="button" onclick="abrirAba('abaTabela', this)">Tabela</button>
-      <button class="tab-btn" type="button" onclick="abrirAba('abaCadastro', this)">Cadastrar aparelho / Histórico</button>
+
+    <!-- ===================== STATS ===================== -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-icon blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Total cadastrados</span>
+          <span class="stat-value" id="statTotal">0</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon green"><i class="fa-solid fa-circle-check"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Disponíveis</span>
+          <span class="stat-value" id="statDisponiveis">0</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon orange"><i class="fa-solid fa-cart-shopping"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Vendas (histórico)</span>
+          <span class="stat-value" id="statVendas">0</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-icon purple"><i class="fa-solid fa-truck-fast"></i></div>
+        <div class="stat-info">
+          <span class="stat-label">Transferências</span>
+          <span class="stat-value" id="statTransferencias">0</span>
+        </div>
+      </div>
     </div>
 
+    <!-- ===================== TABS ===================== -->
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" type="button" onclick="abrirAba('abaTabela', this)" data-testid="tab-tabela">
+        <i class="fa-solid fa-table-list"></i> Tabela de aparelhos
+      </button>
+      <button class="tab-btn" type="button" onclick="abrirAba('abaCadastro', this)" data-testid="tab-cadastro">
+        <i class="fa-solid fa-plus"></i> Cadastrar / Histórico
+      </button>
+    </div>
+
+    <!-- ===================== TAB TABELA ===================== -->
     <div id="abaTabela" class="tab-content active">
       <section class="card" id="areaTabelaPrint">
-        <div class="cabecalho-print">
-          <div class="no-png" style="margin-bottom:10px; width:100%; max-width:350px;">
-            <label for="nomeLoja"><strong>Nome da loja</strong></label>
-            <input id="nomeLoja" type="text" value="Pinheirinho Celulares" oninput="salvarNomeLoja()" />
-          </div>
+        <div class="print-header">
           <div>
             <h3 id="tituloLoja">Pinheirinho Celulares</h3>
-            <p id="dataHoraPrint"></p>
+            <p class="sub" id="dataHoraPrint"></p>
+          </div>
+          <div class="actions no-png">
+            <button class="btn-ghost" type="button" onclick="baixarTabelaPNG()" data-testid="btn-baixar-png">
+              <i class="fa-solid fa-image"></i> Baixar PNG
+            </button>
           </div>
         </div>
 
-        <div class="actions no-png">
-          <button class="btn-secondary" type="button" onclick="baixarTabelaPNG()">Baixar tabela em PNG</button>
+        <div class="table-toolbar no-png">
+          <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="buscaTabela" type="text" placeholder="Buscar por nome, IMEI, categoria..." oninput="atualizarTabela()" data-testid="input-busca" />
+          </div>
+          <div id="filtrosCategoria" style="display:flex; gap:6px; flex-wrap:wrap;"></div>
         </div>
 
-        <h2>Lista de aparelhos</h2>
         <div class="table-wrapper">
           <table>
             <thead>
               <tr>
                 <th>Categoria</th>
-                
                 <th>IMEI</th>
-                <th>Nome</th>
-                <th>Armazenamento</th>
+                <th>Aparelho</th>
+                <th>Armaz.</th>
                 <th>RAM</th>
                 <th>NFC</th>
                 <th>À vista</th>
@@ -183,24 +896,50 @@
               </tr>
             </thead>
             <tbody id="tabelaAparelhos">
-              <tr><td class="empty" colspan="12">Nenhum aparelho cadastrado.</td></tr>
+              <tr><td class="empty" colspan="12"><i class="fa-solid fa-mobile-screen"></i>Nenhum aparelho cadastrado.</td></tr>
             </tbody>
           </table>
         </div>
       </section>
     </div>
 
+    <!-- ===================== TAB CADASTRO ===================== -->
     <div id="abaCadastro" class="tab-content">
       <section class="card">
-        <h2>Novo aparelho</h2>
+        <div class="card-header">
+          <div>
+            <h2 class="card-title"><i class="fa-solid fa-plus-circle"></i> Novo aparelho</h2>
+            <p class="card-subtitle">Preencha os dados para cadastrar um novo aparelho no estoque.</p>
+          </div>
+        </div>
+
         <form id="formAparelho">
           <div class="form-grid">
-            <div><label for="imei">IMEI</label><input id="imei" type="text" /></div>
-            <div class="full"><label for="nome">Nome do aparelho</label><input id="nome" type="text" /></div>
-            <div><label for="armazenamento">Armazenamento</label><input id="armazenamento" type="text" placeholder="Ex: 128GB" /></div>
-            <div><label for="ram">Memória RAM</label><input id="ram" type="text" placeholder="Ex: 4GB" /></div>
-            <div><label for="nfc">Possui NFC?</label><select id="nfc"><option value=""></option><option value="Sim">Sim</option><option value="Não">Não</option></select></div>
-            <div>
+            <div class="field">
+              <label for="imei">IMEI</label>
+              <input id="imei" type="text" placeholder="Digite o IMEI" />
+            </div>
+            <div class="field full">
+              <label for="nome">Nome do aparelho <span class="req">*</span></label>
+              <input id="nome" type="text" placeholder="Ex: iPhone 15 Pro Max" required />
+            </div>
+            <div class="field">
+              <label for="armazenamento">Armazenamento</label>
+              <input id="armazenamento" type="text" placeholder="Ex: 128GB" />
+            </div>
+            <div class="field">
+              <label for="ram">Memória RAM</label>
+              <input id="ram" type="text" placeholder="Ex: 4GB" />
+            </div>
+            <div class="field">
+              <label for="nfc">Possui NFC?</label>
+              <select id="nfc">
+                <option value="">—</option>
+                <option value="Sim">Sim</option>
+                <option value="Não">Não</option>
+              </select>
+            </div>
+            <div class="field">
               <label for="categoria">Categoria</label>
               <select id="categoria">
                 <option value="NOVO">NOVO</option>
@@ -211,70 +950,147 @@
                 <option value="RASTREIO">RASTREIO</option>
               </select>
             </div>
-            <div><label for="avista">Valor à vista</label><input id="avista" type="text" placeholder="R$" /></div>
-            <div><label for="cinco">Valor em 5x</label><input id="cinco" type="text" placeholder="R$" /></div>
-            <div><label for="dez">Valor em 10x</label><input id="dez" type="text" placeholder="R$" /></div>
-            <div><label for="dezoito">Valor em 18x</label><input id="dezoito" type="text" placeholder="R$" /></div>
-            <div class="full-row"><label for="observacao">Observação opcional</label><textarea id="observacao"></textarea></div>
+            <div class="field">
+              <label for="avista">Valor à vista</label>
+              <input id="avista" type="text" placeholder="R$" />
+            </div>
+            <div class="field">
+              <label for="cinco">Valor em 5x</label>
+              <input id="cinco" type="text" placeholder="R$" />
+            </div>
+            <div class="field">
+              <label for="dez">Valor em 10x</label>
+              <input id="dez" type="text" placeholder="R$" />
+            </div>
+            <div class="field">
+              <label for="dezoito">Valor em 18x</label>
+              <input id="dezoito" type="text" placeholder="R$" />
+            </div>
+            <div class="field full-row">
+              <label for="observacao">Observação opcional</label>
+              <textarea id="observacao" placeholder="Detalhes adicionais sobre o aparelho..."></textarea>
+            </div>
           </div>
-          <div class="actions">
-            <button class="btn-primary" type="submit">Cadastrar aparelho</button>
-            <button class="btn-danger" type="button" onclick="limparTudo()">Limpar lista</button>
+
+          <div class="actions" style="margin-top: 18px;">
+            <button class="btn-primary" type="submit" data-testid="btn-cadastrar">
+              <i class="fa-solid fa-check"></i> Cadastrar aparelho
+            </button>
+            <button class="btn-ghost" type="reset">
+              <i class="fa-solid fa-rotate-left"></i> Limpar formulário
+            </button>
+            <button class="btn-danger" type="button" onclick="limparTudo()" style="margin-left:auto;" data-testid="btn-limpar-lista">
+              <i class="fa-solid fa-trash"></i> Limpar lista
+            </button>
           </div>
         </form>
       </section>
 
       <section class="card">
-        <h2>Histórico</h2>
-        <div class="historico-filtros">
-          <div><label for="dataInicio">Data inicial</label><input id="dataInicio" type="date" /></div>
-          <div><label for="dataFim">Data final</label><input id="dataFim" type="date" /></div>
-          <div><label for="tipoFiltro">Tipo</label><select id="tipoFiltro"><option value="Todos">Todos</option><option value="Cadastro">Cadastro</option><option value="Venda">Venda</option><option value="Transferência">Transferência</option><option value="Exclusão">Exclusão</option><option value="Edição">Edição</option></select></div>
-          <button class="btn-secondary" type="button" onclick="atualizarHistorico()">Filtrar</button>
-          <button class="btn-copy" type="button" onclick="copiarRelatorio()">Copiar relatório</button>
-          <button class="btn-danger" type="button" onclick="apagarHistoricoComSenha()">Apagar histórico</button>
+        <div class="card-header">
+          <div>
+            <h2 class="card-title"><i class="fa-solid fa-clock-rotate-left"></i> Histórico de movimentações</h2>
+            <p class="card-subtitle">Filtre cadastros, vendas, transferências, edições e exclusões.</p>
+          </div>
         </div>
-        <div id="relatorioHistorico" class="relatorio-box">Nenhum histórico encontrado.</div>
+
+        <div class="historico-filtros">
+          <div class="field">
+            <label for="dataInicio">Data inicial</label>
+            <input id="dataInicio" type="date" />
+          </div>
+          <div class="field">
+            <label for="dataFim">Data final</label>
+            <input id="dataFim" type="date" />
+          </div>
+          <div class="field">
+            <label for="tipoFiltro">Tipo</label>
+            <select id="tipoFiltro">
+              <option value="Todos">Todos</option>
+              <option value="Cadastro">Cadastro</option>
+              <option value="Venda">Venda</option>
+              <option value="Transferência">Transferência</option>
+              <option value="Exclusão">Exclusão</option>
+              <option value="Edição">Edição</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="buscaHistorico">Busca</label>
+            <input id="buscaHistorico" type="text" placeholder="Cliente, IMEI..." />
+          </div>
+          <button class="btn-accent" type="button" onclick="atualizarHistorico()">
+            <i class="fa-solid fa-filter"></i> Filtrar
+          </button>
+          <button class="btn-copy" type="button" onclick="copiarRelatorio()">
+            <i class="fa-solid fa-copy"></i> Copiar
+          </button>
+          <button class="btn-danger" type="button" onclick="apagarHistoricoComSenha()">
+            <i class="fa-solid fa-trash-can"></i> Apagar
+          </button>
+        </div>
+
+        <div id="relatorioHistorico" class="relatorio-box empty-state">
+          <i class="fa-solid fa-inbox"></i>Nenhum histórico encontrado.
+        </div>
       </section>
     </div>
   </main>
 
+  <!-- ===================== OVERLAY ===================== -->
   <div id="overlayVenda" class="overlay" onclick="fecharPainelVenda()"></div>
 
+  <!-- ===================== PAINEL LATERAL ===================== -->
   <aside id="painelVenda" class="painel-venda">
+
+    <!-- Box Venda -->
     <div id="boxVenda" style="display:none;">
-      <h2>Dados da venda</h2>
+      <div class="painel-header">
+        <h2><i class="fa-solid fa-cart-shopping"></i> Registrar venda</h2>
+        <button class="painel-close" type="button" onclick="fecharPainelVenda()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
       <input id="indiceVenda" type="hidden" />
 
-      <div class="campo"><label for="vendaCliente">Cliente</label><input id="vendaCliente" type="text" /></div>
-      <div class="campo"><label for="vendaCpfCnpj">CPF/CNPJ</label><input id="vendaCpfCnpj" type="text" /></div>
-      <div class="campo"><label for="vendaTelefone">Telefone</label><input id="vendaTelefone" type="text" /></div>
-      <div class="campo"><label for="vendaVendedor">Vendedor</label><input id="vendaVendedor" type="text" /></div>
-      <div class="campo"><label for="vendaPedidoBling">N° Pedido Bling</label><input id="vendaPedidoBling" type="text" /></div>
-      <div class="campo"><label for="vendaCcb">N° CCB</label><input id="vendaCcb" type="text" /></div>
+      <div class="campo"><label for="vendaCliente">Cliente <span class="req">*</span></label><input id="vendaCliente" type="text" placeholder="Nome completo" /></div>
+      <div class="campo"><label for="vendaCpfCnpj">CPF / CNPJ <span class="req">*</span></label><input id="vendaCpfCnpj" type="text" placeholder="000.000.000-00" /></div>
+      <div class="campo"><label for="vendaTelefone">Telefone <span class="req">*</span></label><input id="vendaTelefone" type="text" placeholder="(00) 00000-0000" /></div>
+      <div class="campo"><label for="vendaVendedor">Vendedor <span class="req">*</span></label><input id="vendaVendedor" type="text" placeholder="Nome do vendedor" /></div>
+      <div class="campo"><label for="vendaPedidoBling">N° Pedido Bling <span class="req">*</span></label><input id="vendaPedidoBling" type="text" /></div>
+      <div class="campo"><label for="vendaCcb">N° CCB <span style="color: var(--text-soft); font-weight: 500; text-transform: none;">(opcional)</span></label><input id="vendaCcb" type="text" placeholder="Deixe em branco se não houver" /></div>
 
-      <div class="actions">
-        <button class="btn-primary" type="button" onclick="salvarVendaPainel()">Salvar venda</button>
-        <button class="btn-danger" type="button" onclick="fecharPainelVenda()">Cancelar</button>
+      <div class="painel-actions">
+        <button class="btn-primary" type="button" onclick="salvarVendaPainel()" data-testid="btn-salvar-venda">
+          <i class="fa-solid fa-check"></i> Salvar venda
+        </button>
+        <button class="btn-ghost" type="button" onclick="fecharPainelVenda()">Cancelar</button>
       </div>
     </div>
 
+    <!-- Box Transferência -->
     <div id="boxTransferencia" style="display:none;">
-      <h2>Transferência</h2>
+      <div class="painel-header">
+        <h2><i class="fa-solid fa-truck-fast"></i> Transferência</h2>
+        <button class="painel-close" type="button" onclick="fecharPainelVenda()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
       <input id="indiceTransferencia" type="hidden" />
 
-      <div class="campo"><label for="transferenciaLoja">Loja transferida</label><input id="transferenciaLoja" type="text" /></div>
-      <div class="campo"><label for="transferenciaVendedor">Vendedor</label><input id="transferenciaVendedor" type="text" /></div>
-      <div class="campo"><label for="transferenciaEntregador">Entregador</label><input id="transferenciaEntregador" type="text" /></div>
+      <div class="campo"><label for="transferenciaLoja">Loja de destino <span class="req">*</span></label><input id="transferenciaLoja" type="text" placeholder="Nome da loja" /></div>
+      <div class="campo"><label for="transferenciaVendedor">Vendedor <span class="req">*</span></label><input id="transferenciaVendedor" type="text" /></div>
+      <div class="campo"><label for="transferenciaEntregador">Entregador <span class="req">*</span></label><input id="transferenciaEntregador" type="text" /></div>
 
-      <div class="actions">
-        <button class="btn-purple" type="button" onclick="salvarTransferenciaPainel()">Salvar transferência</button>
-        <button class="btn-danger" type="button" onclick="fecharPainelVenda()">Cancelar</button>
+      <div class="painel-actions">
+        <button class="btn-purple" type="button" onclick="salvarTransferenciaPainel()">
+          <i class="fa-solid fa-check"></i> Salvar transferência
+        </button>
+        <button class="btn-ghost" type="button" onclick="fecharPainelVenda()">Cancelar</button>
       </div>
     </div>
 
+    <!-- Box Editar -->
     <div id="boxEditar" style="display:none;">
-      <h2>Editar produto</h2>
+      <div class="painel-header">
+        <h2><i class="fa-solid fa-pen-to-square"></i> Editar aparelho</h2>
+        <button class="painel-close" type="button" onclick="fecharPainelVenda()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
       <input id="indiceEditar" type="hidden" />
 
       <div class="campo"><label for="editarImei">IMEI</label><input id="editarImei" type="text" /></div>
@@ -295,7 +1111,7 @@
       <div class="campo">
         <label for="editarNfc">Possui NFC?</label>
         <select id="editarNfc">
-          <option value=""></option>
+          <option value="">—</option>
           <option value="Sim">Sim</option>
           <option value="Não">Não</option>
         </select>
@@ -306,43 +1122,121 @@
       <div class="campo"><label for="editarDezoito">Valor em 18x</label><input id="editarDezoito" type="text" /></div>
       <div class="campo"><label for="editarObservacao">Observação</label><textarea id="editarObservacao"></textarea></div>
 
-      <div class="actions">
-        <button class="btn-primary" type="button" onclick="salvarEdicaoPainel()">Salvar edição</button>
-        <button class="btn-danger" type="button" onclick="fecharPainelVenda()">Cancelar</button>
+      <div class="painel-actions">
+        <button class="btn-primary" type="button" onclick="salvarEdicaoPainel()">
+          <i class="fa-solid fa-check"></i> Salvar edição
+        </button>
+        <button class="btn-ghost" type="button" onclick="fecharPainelVenda()">Cancelar</button>
       </div>
     </div>
   </aside>
 
-  <div id="modalPreviewVenda" class="modal-preview">
-    <div class="modal-content">
-      <h2>Pré-visualização da venda</h2>
-      <div id="textoPreviewVenda" class="preview-texto"></div>
-      <div class="actions">
-        <button class="btn-copy" type="button" onclick="copiarPreviewVenda()">Copiar</button>
-        <button class="btn-secondary" type="button" onclick="fecharPreviewVenda()">Fechar</button>
+  <!-- ===================== MODAL CONFIG LOJA ===================== -->
+  <div id="modalSetupLoja" class="modal-setup">
+    <div class="modal-content" style="width:440px;">
+      <h2><i class="fa-solid fa-store"></i> Configurar loja</h2>
+      <p class="modal-desc">Informe o nome da sua loja. Ele aparecerá no topo, na tabela exportada e nos recibos.</p>
+      <div class="field" style="margin-bottom: 16px;">
+        <label for="inputNomeLoja">Nome da loja</label>
+        <input id="inputNomeLoja" type="text" placeholder="Ex: Pinheirinho Celulares" />
+      </div>
+      <div class="actions" style="justify-content: flex-end;">
+        <button class="btn-ghost" type="button" id="btnCancelarLoja" onclick="fecharModalLoja()">Cancelar</button>
+        <button class="btn-primary" type="button" onclick="salvarNomeLoja()" data-testid="btn-salvar-loja">
+          <i class="fa-solid fa-check"></i> Salvar
+        </button>
       </div>
     </div>
   </div>
 
+  <!-- ===================== MODAL PREVIEW ===================== -->
+  <div id="modalPreviewVenda" class="modal-preview">
+    <div class="modal-content">
+      <h2><i class="fa-solid fa-receipt"></i> Pré-visualização</h2>
+      <p class="modal-desc">Confira os dados e copie para enviar ao cliente ou registrar internamente.</p>
+      <div id="textoPreviewVenda" class="preview-texto"></div>
+      <div class="actions" style="justify-content: flex-end;">
+        <button class="btn-ghost" type="button" onclick="fecharPreviewVenda()">Fechar</button>
+        <button class="btn-copy" type="button" onclick="copiarPreviewVenda()">
+          <i class="fa-solid fa-copy"></i> Copiar texto
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== TOASTS ===================== -->
+  <div class="toast-container" id="toastContainer"></div>
+
   <script>
+    /* =================== TOASTS =================== */
+    function showToast(message, type = 'success', duration = 2800) {
+      const container = document.getElementById('toastContainer');
+      const icons = { success: 'fa-circle-check', error: 'fa-circle-exclamation', warning: 'fa-triangle-exclamation', info: 'fa-circle-info' };
+      const t = document.createElement('div');
+      t.className = `toast ${type}`;
+      t.innerHTML = `<i class="fa-solid ${icons[type] || icons.info}"></i><span>${message}</span>`;
+      container.appendChild(t);
+      setTimeout(() => {
+        t.classList.add('removing');
+        setTimeout(() => t.remove(), 250);
+      }, duration);
+    }
+
+    /* =================== TABS =================== */
     function abrirAba(idAba, botao) {
-      document.querySelectorAll('.tab-content').forEach(aba => aba.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-content').forEach(a => a.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById(idAba).classList.add('active');
       botao.classList.add('active');
     }
 
-    const nomeLojaInput = document.getElementById('nomeLoja');
+    /* =================== LOJA / SETUP =================== */
     const tituloLoja = document.getElementById('tituloLoja');
+    const nomeLojaPill = document.getElementById('nomeLojaPill');
+    const inputNomeLoja = document.getElementById('inputNomeLoja');
+    const modalSetupLoja = document.getElementById('modalSetupLoja');
+    const btnCancelarLoja = document.getElementById('btnCancelarLoja');
 
-    nomeLojaInput.value = localStorage.getItem('nomeLoja') || 'Pinheirinho Celulares';
-    tituloLoja.innerText = nomeLojaInput.value;
-
-    function salvarNomeLoja() {
-      localStorage.setItem('nomeLoja', nomeLojaInput.value);
-      tituloLoja.innerText = nomeLojaInput.value || 'Nome da Loja';
+    function getNomeLoja() {
+      return localStorage.getItem('nomeLoja') || '';
     }
 
+    function aplicarNomeLoja() {
+      const nome = getNomeLoja();
+      if (nome) {
+        tituloLoja.innerText = nome;
+        nomeLojaPill.innerText = nome;
+      } else {
+        tituloLoja.innerText = 'Sua loja';
+        nomeLojaPill.innerText = 'Configurar loja';
+      }
+    }
+
+    function abrirModalLoja() {
+      inputNomeLoja.value = getNomeLoja();
+      btnCancelarLoja.style.display = getNomeLoja() ? '' : 'none';
+      modalSetupLoja.classList.add('active');
+      setTimeout(() => inputNomeLoja.focus(), 100);
+    }
+
+    function fecharModalLoja() {
+      if (!getNomeLoja()) return; // não fecha se ainda não tem nome
+      modalSetupLoja.classList.remove('active');
+    }
+
+    function salvarNomeLoja() {
+      const nome = inputNomeLoja.value.trim();
+      if (!nome) {
+        showToast('Informe o nome da loja para continuar.', 'warning');
+        return;
+      }
+      localStorage.setItem('nomeLoja', nome);
+      aplicarNomeLoja();
+      modalSetupLoja.classList.remove('active');
+      showToast('Loja configurada com sucesso!', 'success');
+    }
+
+    /* =================== STATE =================== */
     const form = document.getElementById('formAparelho');
     const tabela = document.getElementById('tabelaAparelhos');
     const relatorioHistorico = document.getElementById('relatorioHistorico');
@@ -350,15 +1244,30 @@
     let aparelhos = JSON.parse(localStorage.getItem('aparelhos')) || [];
     let historico = JSON.parse(localStorage.getItem('historicoAparelhos')) || [];
     let ultimoTextoVenda = '';
+    let filtroCategoriaAtivo = 'Todas';
 
-    form.addEventListener('submit', function(event) {
-      event.preventDefault();
+    const CATEGORIAS = ['NOVO', 'NOVO DE VITRINE', 'SEMI-NOVO', 'OUTLET', 'USO LOJA', 'RASTREIO'];
+    const categoriaClass = {
+      'NOVO': 'cat-novo',
+      'NOVO DE VITRINE': 'cat-vitrine',
+      'SEMI-NOVO': 'cat-semi',
+      'OUTLET': 'cat-outlet',
+      'USO LOJA': 'cat-uso',
+      'RASTREIO': 'cat-rastreio'
+    };
+
+    /* =================== FORM SUBMIT =================== */
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const nome = valor('nome');
+      if (!nome) { showToast('Informe o nome do aparelho.', 'warning'); return; }
+
       const aparelho = {
         id: Date.now(),
         categoria: valor('categoria'),
         status: 'Disponível',
         imei: valor('imei'),
-        nome: valor('nome'),
+        nome,
         armazenamento: valor('armazenamento'),
         ram: valor('ram'),
         nfc: valor('nfc'),
@@ -376,6 +1285,8 @@
       salvarDados();
       form.reset();
       atualizarTela();
+      showToast('Aparelho cadastrado com sucesso!', 'success');
+      // volta pra aba de tabela
       document.querySelector('.tab-btn').click();
     });
 
@@ -386,235 +1297,210 @@
       localStorage.setItem('historicoAparelhos', JSON.stringify(historico));
     }
 
+    /* =================== UPDATE TELA =================== */
     function atualizarTela() {
+      atualizarFiltrosCategoria();
       atualizarTabela();
       atualizarHistorico();
-      document.getElementById('dataHoraPrint').innerText = `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+      atualizarStats();
+      document.getElementById('dataHoraPrint').innerText = `Gerado em ${new Date().toLocaleString('pt-BR')}`;
+    }
+
+    function atualizarStats() {
+      document.getElementById('statTotal').innerText = aparelhos.length;
+      document.getElementById('statDisponiveis').innerText = aparelhos.length;
+      document.getElementById('statVendas').innerText = historico.filter(h => h.tipo === 'Venda').length;
+      document.getElementById('statTransferencias').innerText = historico.filter(h => h.tipo === 'Transferência').length;
+    }
+
+    function atualizarFiltrosCategoria() {
+      const cont = document.getElementById('filtrosCategoria');
+      const all = ['Todas', ...CATEGORIAS];
+      cont.innerHTML = all.map(c => {
+        const count = c === 'Todas' ? aparelhos.length : aparelhos.filter(a => a.categoria === c).length;
+        if (c !== 'Todas' && count === 0) return '';
+        const active = c === filtroCategoriaAtivo ? 'active' : '';
+        return `<button type="button" class="filter-chip ${active}" onclick="setFiltroCategoria('${c}')">${c} <span style="opacity:0.65">${count}</span></button>`;
+      }).join('');
+    }
+
+    function setFiltroCategoria(c) {
+      filtroCategoriaAtivo = c;
+      atualizarFiltrosCategoria();
+      atualizarTabela();
     }
 
     function atualizarTabela() {
-      const ordemCategorias = {
-        'NOVO': 1,
-        'NOVO DE VITRINE': 2,
-        'SEMI-NOVO': 3,
-        'OUTLET': 4,
-        'USO LOJA': 5,
-        'RASTREIO': 6
-      };
+      const ordemCategorias = { 'NOVO': 1, 'NOVO DE VITRINE': 2, 'SEMI-NOVO': 3, 'OUTLET': 4, 'USO LOJA': 5, 'RASTREIO': 6 };
+      aparelhos.sort((a, b) => (ordemCategorias[a.categoria] || 99) - (ordemCategorias[b.categoria] || 99));
 
-      aparelhos.sort((a, b) => {
-        return (ordemCategorias[a.categoria] || 99) - (ordemCategorias[b.categoria] || 99);
-      });
+      const busca = (document.getElementById('buscaTabela')?.value || '').toLowerCase().trim();
+
+      const lista = aparelhos
+        .map((a, idx) => ({ a, idx }))
+        .filter(({ a }) => filtroCategoriaAtivo === 'Todas' || a.categoria === filtroCategoriaAtivo)
+        .filter(({ a }) => {
+          if (!busca) return true;
+          return [a.nome, a.imei, a.categoria, a.armazenamento, a.ram, a.observacao]
+            .filter(Boolean).some(v => v.toLowerCase().includes(busca));
+        });
+
       tabela.innerHTML = '';
-      if (aparelhos.length === 0) {
-        tabela.innerHTML = '<tr><td class="empty" colspan="12">Nenhum aparelho cadastrado.</td></tr>';
+      if (lista.length === 0) {
+        const msg = aparelhos.length === 0 ? 'Nenhum aparelho cadastrado.' : 'Nenhum resultado para os filtros aplicados.';
+        tabela.innerHTML = `<tr><td class="empty" colspan="12"><i class="fa-solid fa-mobile-screen"></i>${msg}</td></tr>`;
         return;
       }
 
-      aparelhos.forEach((aparelho, index) => {
+      lista.forEach(({ a, idx }) => {
         const linha = document.createElement('tr');
+        const catCls = categoriaClass[a.categoria] || '';
+        const nfcHtml = a.nfc === 'Sim' ? `<span class="nfc-yes"><i class="fa-solid fa-wifi"></i> Sim</span>`
+                       : a.nfc === 'Não' ? `<span class="nfc-no">Não</span>`
+                       : `<span class="nfc-no">—</span>`;
+        const priceCell = v => v ? `<span class="price-cell">R$ ${escapeHtml(v)}</span>` : `<span class="price-cell muted">—</span>`;
+
         linha.innerHTML = `
-          <td><strong>${aparelho.categoria || ''}</strong></td>
-          
-          <td>${aparelho.imei || ''}</td>
-          <td>${aparelho.nome || ''}</td>
-          <td>${aparelho.armazenamento || ''}</td>
-          <td>${aparelho.ram || ''}</td>
-          <td>${aparelho.nfc || ''}</td>
-          <td>${aparelho.avista || ''}</td>
-          <td>${aparelho.cinco || ''}</td>
-          <td>${aparelho.dez || ''}</td>
-          <td>${aparelho.dezoito || ''}</td>
-          <td>${aparelho.observacao || ''}</td>
+          <td><span class="category-badge ${catCls}">${escapeHtml(a.categoria || '')}</span></td>
+          <td><span class="imei-cell">${escapeHtml(a.imei || '—')}</span></td>
+          <td><strong>${escapeHtml(a.nome || '')}</strong></td>
+          <td>${escapeHtml(a.armazenamento || '—')}</td>
+          <td>${escapeHtml(a.ram || '—')}</td>
+          <td>${nfcHtml}</td>
+          <td>${priceCell(a.avista)}</td>
+          <td>${priceCell(a.cinco)}</td>
+          <td>${priceCell(a.dez)}</td>
+          <td>${priceCell(a.dezoito)}</td>
+          <td style="max-width:180px;">${escapeHtml(a.observacao || '')}</td>
           <td class="coluna-acoes no-png">
             <div class="acao-botoes">
-              <button class="btn-copy" type="button" onclick="copiarInformacoes(${index})">Copiar</button>
-              <button class="btn-secondary" type="button" onclick="editarProduto(${index})">Editar</button>
-              <button class="btn-warning" type="button" onclick="marcarVendido(${index})">Vendido</button>
-              <button class="btn-purple" type="button" onclick="marcarTransferido(${index})">Transferido</button>
-              <button class="btn-danger" type="button" onclick="removerAparelho(${index})">Excluir</button>
+              <button class="btn-copy btn-icon" type="button" onclick="copiarInformacoes(${idx})" title="Copiar"><i class="fa-solid fa-copy"></i></button>
+              <button class="btn-secondary btn-icon" type="button" onclick="editarProduto(${idx})" title="Editar"><i class="fa-solid fa-pen"></i></button>
+              <button class="btn-warning btn-icon" type="button" onclick="marcarVendido(${idx})" title="Vendido"><i class="fa-solid fa-cart-shopping"></i></button>
+              <button class="btn-purple btn-icon" type="button" onclick="marcarTransferido(${idx})" title="Transferir"><i class="fa-solid fa-truck-fast"></i></button>
+              <button class="btn-danger btn-icon" type="button" onclick="removerAparelho(${idx})" title="Excluir"><i class="fa-solid fa-trash"></i></button>
             </div>
           </td>`;
         tabela.appendChild(linha);
       });
     }
 
-    
+    function escapeHtml(s) {
+      return String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
 
-    function montarTextoCopiar(aparelho) {
-      let texto = `*Aparelho*: ${aparelho.nome || ''}
-` +
-                  `*Memória*: ${aparelho.armazenamento || ''} GB / ${aparelho.ram || ''} RAM
-` +
-                  `*À vista*: R$ ${aparelho.avista || ''}
-` +
-                  `*5x*: R$ ${aparelho.cinco || ''}
-` +
-                  `*10x*: R$ ${aparelho.dez || ''}
-` +
-                  `*18x*: R$ ${aparelho.dezoito || ''}`;
-
-      if (aparelho.observacao && aparelho.observacao.trim() !== '') {
-        texto += `
-*Observação*: ${aparelho.observacao}`;
-      }
-
+    /* =================== COPIAR INFOS =================== */
+    function montarTextoCopiar(a) {
+      let texto = `*Aparelho*: ${a.nome || ''}\n` +
+                  `*Memória*: ${a.armazenamento || ''} / ${a.ram || ''} RAM\n` +
+                  `*À vista*: R$ ${a.avista || ''}\n` +
+                  `*5x*: R$ ${a.cinco || ''}\n` +
+                  `*10x*: R$ ${a.dez || ''}\n` +
+                  `*18x*: R$ ${a.dezoito || ''}`;
+      if (a.observacao && a.observacao.trim() !== '') texto += `\n*Observação*: ${a.observacao}`;
       return texto;
     }
 
+    function copiarInformacoes(index) {
+      navigator.clipboard.writeText(montarTextoCopiar(aparelhos[index])).then(() => showToast('Informações copiadas!', 'success'));
+    }
+
+    /* =================== EDITAR =================== */
     function editarProduto(index) {
-      const aparelho = aparelhos[index];
-      if (!aparelho) return;
-
+      const a = aparelhos[index];
+      if (!a) return;
       document.getElementById('indiceEditar').value = index;
-      document.getElementById('editarImei').value = aparelho.imei || '';
-      document.getElementById('editarNome').value = aparelho.nome || '';
-      document.getElementById('editarCategoria').value = aparelho.categoria || 'NOVO';
-      document.getElementById('editarArmazenamento').value = aparelho.armazenamento || '';
-      document.getElementById('editarRam').value = aparelho.ram || '';
-      document.getElementById('editarNfc').value = aparelho.nfc || '';
-      document.getElementById('editarAvista').value = aparelho.avista || '';
-      document.getElementById('editarCinco').value = aparelho.cinco || '';
-      document.getElementById('editarDez').value = aparelho.dez || '';
-      document.getElementById('editarDezoito').value = aparelho.dezoito || '';
-      document.getElementById('editarObservacao').value = aparelho.observacao || '';
+      document.getElementById('editarImei').value = a.imei || '';
+      document.getElementById('editarNome').value = a.nome || '';
+      document.getElementById('editarCategoria').value = a.categoria || 'NOVO';
+      document.getElementById('editarArmazenamento').value = a.armazenamento || '';
+      document.getElementById('editarRam').value = a.ram || '';
+      document.getElementById('editarNfc').value = a.nfc || '';
+      document.getElementById('editarAvista').value = a.avista || '';
+      document.getElementById('editarCinco').value = a.cinco || '';
+      document.getElementById('editarDez').value = a.dez || '';
+      document.getElementById('editarDezoito').value = a.dezoito || '';
+      document.getElementById('editarObservacao').value = a.observacao || '';
 
-      mostrarBoxEditar();
-      document.getElementById('overlayVenda').classList.add('active');
-      document.getElementById('painelVenda').classList.add('active');
+      mostrarBox('boxEditar');
+      abrirPainel();
       document.getElementById('editarNome').focus();
     }
 
     function salvarEdicaoPainel() {
       const index = Number(document.getElementById('indiceEditar').value);
-      const aparelho = aparelhos[index];
-      if (!aparelho) return;
+      const a = aparelhos[index];
+      if (!a) return;
+      a.imei = document.getElementById('editarImei').value.trim();
+      a.nome = document.getElementById('editarNome').value.trim();
+      a.categoria = document.getElementById('editarCategoria').value;
+      a.armazenamento = document.getElementById('editarArmazenamento').value.trim();
+      a.ram = document.getElementById('editarRam').value.trim();
+      a.nfc = document.getElementById('editarNfc').value;
+      a.avista = document.getElementById('editarAvista').value.trim();
+      a.cinco = document.getElementById('editarCinco').value.trim();
+      a.dez = document.getElementById('editarDez').value.trim();
+      a.dezoito = document.getElementById('editarDezoito').value.trim();
+      a.observacao = document.getElementById('editarObservacao').value.trim();
 
-      aparelho.imei = document.getElementById('editarImei').value.trim();
-      aparelho.nome = document.getElementById('editarNome').value.trim();
-      aparelho.categoria = document.getElementById('editarCategoria').value;
-      aparelho.armazenamento = document.getElementById('editarArmazenamento').value.trim();
-      aparelho.ram = document.getElementById('editarRam').value.trim();
-      aparelho.nfc = document.getElementById('editarNfc').value;
-      aparelho.avista = document.getElementById('editarAvista').value.trim();
-      aparelho.cinco = document.getElementById('editarCinco').value.trim();
-      aparelho.dez = document.getElementById('editarDez').value.trim();
-      aparelho.dezoito = document.getElementById('editarDezoito').value.trim();
-      aparelho.observacao = document.getElementById('editarObservacao').value.trim();
-
-      registrarHistorico('Edição', aparelho, 'Produto editado pelo painel lateral');
+      registrarHistorico('Edição', a, 'Produto editado pelo painel lateral');
       salvarDados();
       atualizarTela();
       fecharPainelVenda();
-      alert('Produto editado e salvo com sucesso!');
+      showToast('Aparelho editado com sucesso!', 'success');
     }
 
-    function copiarInformacoes(index) {
-      navigator.clipboard.writeText(montarTextoCopiar(aparelhos[index])).then(() => alert('Informações copiadas!'));
+    /* =================== PAINEL =================== */
+    function mostrarBox(idMostrar) {
+      ['boxVenda', 'boxTransferencia', 'boxEditar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = id === idMostrar ? 'block' : 'none';
+      });
     }
 
-    function mostrarBoxVenda() {
-      const boxVenda = document.getElementById('boxVenda');
-      const boxTransferencia = document.getElementById('boxTransferencia');
-      const boxEditar = document.getElementById('boxEditar');
-
-      if (boxVenda) boxVenda.style.display = 'block';
-      if (boxTransferencia) boxTransferencia.style.display = 'none';
-      if (boxEditar) boxEditar.style.display = 'none';
-    }
-
-    function mostrarBoxTransferencia() {
-      const boxVenda = document.getElementById('boxVenda');
-      const boxTransferencia = document.getElementById('boxTransferencia');
-      const boxEditar = document.getElementById('boxEditar');
-
-      if (boxVenda) boxVenda.style.display = 'none';
-      if (boxTransferencia) boxTransferencia.style.display = 'block';
-      if (boxEditar) boxEditar.style.display = 'none';
-    }
-
-    function mostrarBoxEditar() {
-      const boxVenda = document.getElementById('boxVenda');
-      const boxTransferencia = document.getElementById('boxTransferencia');
-      const boxEditar = document.getElementById('boxEditar');
-
-      if (boxVenda) boxVenda.style.display = 'none';
-      if (boxTransferencia) boxTransferencia.style.display = 'none';
-      if (boxEditar) boxEditar.style.display = 'block';
-    }
-
-    function marcarVendido(index) {
-      document.getElementById('indiceVenda').value = index;
-      document.getElementById('vendaCliente').value = '';
-      document.getElementById('vendaCpfCnpj').value = '';
-      document.getElementById('vendaTelefone').value = '';
-      document.getElementById('vendaVendedor').value = '';
-      document.getElementById('vendaPedidoBling').value = '';
-      document.getElementById('vendaCcb').value = '';
-
-      document.getElementById('boxVenda').style.display = 'block';
-      document.getElementById('boxTransferencia').style.display = 'none';
+    function abrirPainel() {
       document.getElementById('overlayVenda').classList.add('active');
       document.getElementById('painelVenda').classList.add('active');
-      document.getElementById('vendaCliente').focus();
     }
 
     function fecharPainelVenda() {
-      const boxVenda = document.getElementById('boxVenda');
-      const boxTransferencia = document.getElementById('boxTransferencia');
-      const boxEditar = document.getElementById('boxEditar');
-
-      if (boxVenda) boxVenda.style.display = 'none';
-      if (boxTransferencia) boxTransferencia.style.display = 'none';
-      if (boxEditar) boxEditar.style.display = 'none';
+      ['boxVenda', 'boxTransferencia', 'boxEditar'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.style.display = 'none';
+      });
       document.getElementById('overlayVenda').classList.remove('active');
       document.getElementById('painelVenda').classList.remove('active');
     }
 
+    /* =================== VENDA =================== */
+    function marcarVendido(index) {
+      document.getElementById('indiceVenda').value = index;
+      ['vendaCliente','vendaCpfCnpj','vendaTelefone','vendaVendedor','vendaPedidoBling','vendaCcb'].forEach(id => document.getElementById(id).value = '');
+      mostrarBox('boxVenda');
+      abrirPainel();
+      document.getElementById('vendaCliente').focus();
+    }
+
     function salvarVendaPainel() {
       const index = Number(document.getElementById('indiceVenda').value);
-      const aparelho = aparelhos[index];
-      if (!aparelho) return;
+      const a = aparelhos[index];
+      if (!a) return;
+      const cliente = valor('vendaCliente'), cpfCnpj = valor('vendaCpfCnpj'), telefone = valor('vendaTelefone');
+      const vendedor = valor('vendaVendedor'), pedidoBling = valor('vendaPedidoBling'), numeroCcb = valor('vendaCcb');
 
-      const cliente = document.getElementById('vendaCliente').value.trim();
-      const cpfCnpj = document.getElementById('vendaCpfCnpj').value.trim();
-      const telefone = document.getElementById('vendaTelefone').value.trim();
-      const vendedor = document.getElementById('vendaVendedor').value.trim();
-      const pedidoBling = document.getElementById('vendaPedidoBling').value.trim();
-      const numeroCcb = document.getElementById('vendaCcb').value.trim();
-
-      if (!cliente || !cpfCnpj || !telefone || !vendedor || !pedidoBling || !numeroCcb) {
-        alert('Preencha todos os campos da venda.');
+      if (!cliente || !cpfCnpj || !telefone || !vendedor || !pedidoBling) {
+        showToast('Preencha todos os campos obrigatórios da venda.', 'warning');
         return;
       }
 
       const dataCompra = new Date().toLocaleString('pt-BR');
-      const loja = localStorage.getItem('nomeLoja') || nomeLojaInput.value || 'Pinheirinho Celulares';
-      const produto = `${aparelho.nome || ''} ${aparelho.armazenamento || ''} GB / ${aparelho.ram || ''} RAM${aparelho.observacao ? ' ' + aparelho.observacao : ''}`.trim();
+      const loja = getNomeLoja() || 'Loja';
+      const produto = `${a.nome || ''} ${a.armazenamento || ''} / ${a.ram || ''} RAM${a.observacao ? ' ' + a.observacao : ''}`.trim();
 
-      const textoVenda = `CLIENTE: ${cliente}
-` +
-                         `CPF/CNPJ: ${cpfCnpj}
-` +
-                         `TELEFONE: ${telefone}
-` +
-                         `DATA DA COMPRA: ${dataCompra}
-` +
-                         `LOJA: ${loja}
-` +
-                         `PRODUTO: ${produto}
-` +
-                         `IMEI: ${aparelho.imei || ''}
-` +
-                         `VENDEDOR: ${vendedor}
-` +
-                         `N° PEDIDO BLING: ${pedidoBling}
-` +
-                         `N° CCB: ${numeroCcb}`;
+      const textoVenda = `CLIENTE: ${cliente}\nCPF/CNPJ: ${cpfCnpj}\nTELEFONE: ${telefone}\nDATA DA COMPRA: ${dataCompra}\nLOJA: ${loja}\nPRODUTO: ${produto}\nIMEI: ${a.imei || ''}\nVENDEDOR: ${vendedor}\nN° PEDIDO BLING: ${pedidoBling}\nN° CCB: ${numeroCcb || '—'}`;
+      const venda = { cliente, cpfCnpj, telefone, dataCompra, loja, produto, imei: a.imei || '', vendedor, pedidoBling, numeroCcb, textoVenda };
 
-      const venda = { cliente, cpfCnpj, telefone, dataCompra, loja, produto, imei: aparelho.imei || '', vendedor, pedidoBling, numeroCcb, textoVenda };
-
-      registrarHistorico('Venda', aparelho, textoVenda, venda);
+      registrarHistorico('Venda', a, textoVenda, venda);
       aparelhos.splice(index, 1);
       salvarDados();
       atualizarTela();
@@ -623,74 +1509,47 @@
       ultimoTextoVenda = textoVenda;
       document.getElementById('textoPreviewVenda').textContent = textoVenda;
       document.getElementById('modalPreviewVenda').classList.add('active');
+      showToast('Venda registrada!', 'success');
     }
 
     function copiarPreviewVenda() {
-      navigator.clipboard.writeText(ultimoTextoVenda).then(() => alert('Informações da venda copiadas!'));
+      navigator.clipboard.writeText(ultimoTextoVenda).then(() => showToast('Informações da venda copiadas!', 'success'));
     }
 
     function fecharPreviewVenda() {
       document.getElementById('modalPreviewVenda').classList.remove('active');
     }
 
+    /* =================== TRANSFERÊNCIA =================== */
     function marcarTransferido(index) {
       document.getElementById('indiceTransferencia').value = index;
-      document.getElementById('transferenciaLoja').value = '';
-      document.getElementById('transferenciaVendedor').value = '';
-      document.getElementById('transferenciaEntregador').value = '';
-
-      document.getElementById('boxVenda').style.display = 'none';
-      document.getElementById('boxTransferencia').style.display = 'block';
-      document.getElementById('overlayVenda').classList.add('active');
-      document.getElementById('painelVenda').classList.add('active');
+      ['transferenciaLoja','transferenciaVendedor','transferenciaEntregador'].forEach(id => document.getElementById(id).value = '');
+      mostrarBox('boxTransferencia');
+      abrirPainel();
       document.getElementById('transferenciaLoja').focus();
     }
 
     function salvarTransferenciaPainel() {
       const index = Number(document.getElementById('indiceTransferencia').value);
-      const aparelho = aparelhos[index];
-      if (!aparelho) return;
-
-      const lojaTransferida = document.getElementById('transferenciaLoja').value.trim();
-      const vendedor = document.getElementById('transferenciaVendedor').value.trim();
-      const entregador = document.getElementById('transferenciaEntregador').value.trim();
+      const a = aparelhos[index];
+      if (!a) return;
+      const lojaTransferida = valor('transferenciaLoja');
+      const vendedor = valor('transferenciaVendedor');
+      const entregador = valor('transferenciaEntregador');
 
       if (!lojaTransferida || !vendedor || !entregador) {
-        alert('Preencha todos os campos da transferência.');
+        showToast('Preencha todos os campos da transferência.', 'warning');
         return;
       }
 
       const dataTransferencia = new Date().toLocaleString('pt-BR');
-      const lojaOrigem = localStorage.getItem('nomeLoja') || nomeLojaInput.value || 'Pinheirinho Celulares';
+      const lojaOrigem = getNomeLoja() || 'Loja';
+      const produto = `${a.nome || ''} ${a.armazenamento || ''} / ${a.ram || ''} RAM${a.observacao ? ' ' + a.observacao : ''}`.trim();
 
-      const produto = `${aparelho.nome || ''} ${aparelho.armazenamento || ''} GB / ${aparelho.ram || ''} RAM${aparelho.observacao ? ' ' + aparelho.observacao : ''}`.trim();
+      const textoTransferencia = `LOJA ORIGEM: ${lojaOrigem}\nLOJA DESTINO: ${lojaTransferida}\nDATA: ${dataTransferencia}\nPRODUTO: ${produto}\nIMEI: ${a.imei || ''}\nVENDEDOR: ${vendedor}\nENTREGADOR: ${entregador}`;
+      const dados = { lojaOrigem, lojaTransferida, dataTransferencia, produto, imei: a.imei || '', vendedor, entregador, textoTransferencia };
 
-      const textoTransferencia = `LOJA ORIGEM: ${lojaOrigem}
-` +
-                                 `LOJA DESTINO: ${lojaTransferida}
-` +
-                                 `DATA: ${dataTransferencia}
-` +
-                                 `PRODUTO: ${produto}
-` +
-                                 `IMEI: ${aparelho.imei || ''}
-` +
-                                 `VENDEDOR: ${vendedor}
-` +
-                                 `ENTREGADOR: ${entregador}`;
-
-      const dadosTransferencia = {
-        lojaOrigem,
-        lojaTransferida,
-        dataTransferencia,
-        produto,
-        imei: aparelho.imei || '',
-        vendedor,
-        entregador,
-        textoTransferencia
-      };
-
-      registrarHistorico('Transferência', aparelho, textoTransferencia, dadosTransferencia);
+      registrarHistorico('Transferência', a, textoTransferencia, dados);
       aparelhos.splice(index, 1);
       salvarDados();
       atualizarTela();
@@ -699,32 +1558,28 @@
       ultimoTextoVenda = textoTransferencia;
       document.getElementById('textoPreviewVenda').textContent = textoTransferencia;
       document.getElementById('modalPreviewVenda').classList.add('active');
+      showToast('Transferência registrada!', 'success');
     }
 
+    /* =================== REMOVER =================== */
     function removerAparelho(index) {
       if (!confirm('Deseja excluir este aparelho da lista?')) return;
       registrarHistorico('Exclusão', aparelhos[index], 'Aparelho removido da lista');
       aparelhos.splice(index, 1);
       salvarDados();
       atualizarTela();
+      showToast('Aparelho excluído.', 'info');
     }
 
-    function registrarHistorico(tipo, aparelho, detalhe, dadosExtras = {}) {
+    /* =================== HISTÓRICO =================== */
+    function registrarHistorico(tipo, a, detalhe, dadosExtras = {}) {
       historico.push({
         data: new Date().toISOString(),
-        tipo,
-        detalhe,
-        categoria: aparelho.categoria,
-        nome: aparelho.nome,
-        imei: aparelho.imei,
-        armazenamento: aparelho.armazenamento,
-        ram: aparelho.ram,
-        avista: aparelho.avista,
-        cinco: aparelho.cinco,
-        dez: aparelho.dez,
-        dezoito: aparelho.dezoito,
-        observacao: aparelho.observacao,
-        dadosExtras
+        tipo, detalhe,
+        categoria: a.categoria, nome: a.nome, imei: a.imei,
+        armazenamento: a.armazenamento, ram: a.ram,
+        avista: a.avista, cinco: a.cinco, dez: a.dez, dezoito: a.dezoito,
+        observacao: a.observacao, dadosExtras
       });
     }
 
@@ -732,85 +1587,108 @@
       const inicio = document.getElementById('dataInicio').value;
       const fim = document.getElementById('dataFim').value;
       const tipo = document.getElementById('tipoFiltro').value;
+      const busca = (document.getElementById('buscaHistorico')?.value || '').toLowerCase().trim();
+
       const filtrado = historico.filter(item => {
         const dataItem = item.data.slice(0, 10);
-        return (!inicio || dataItem >= inicio) && (!fim || dataItem <= fim) && (tipo === 'Todos' || item.tipo === tipo);
+        const okData = (!inicio || dataItem >= inicio) && (!fim || dataItem <= fim);
+        const okTipo = tipo === 'Todos' || item.tipo === tipo;
+        const okBusca = !busca || [item.nome, item.imei, item.detalhe, item.dadosExtras?.cliente, item.dadosExtras?.lojaTransferida]
+                         .filter(Boolean).some(v => String(v).toLowerCase().includes(busca));
+        return okData && okTipo && okBusca;
       });
 
       if (filtrado.length === 0) {
-        relatorioHistorico.textContent = 'Nenhum histórico encontrado.';
+        relatorioHistorico.className = 'relatorio-box empty-state';
+        relatorioHistorico.innerHTML = '<i class="fa-solid fa-inbox"></i>Nenhum histórico encontrado.';
         return;
       }
 
+      relatorioHistorico.className = 'relatorio-box';
       relatorioHistorico.textContent = filtrado.map(item => {
         const dataBR = new Date(item.data).toLocaleString('pt-BR');
         if (item.tipo === 'Venda' && item.dadosExtras && item.dadosExtras.textoVenda) {
-          return `[${dataBR}] VENDA REGISTRADA
-${item.dadosExtras.textoVenda}
-`;
+          return `[${dataBR}] VENDA REGISTRADA\n${item.dadosExtras.textoVenda}\n`;
         }
-
-        return `[${dataBR}] ${item.tipo}
-Categoria: ${item.categoria || ''}
-Aparelho: ${item.nome || ''}
-IMEI: ${item.imei || ''}
-Detalhe: ${item.detalhe || ''}
-Valores: À vista ${item.avista || ''} | 5x ${item.cinco || ''} | 10x ${item.dez || ''} | 18x ${item.dezoito || ''}
-`;
+        if (item.tipo === 'Transferência' && item.dadosExtras && item.dadosExtras.textoTransferencia) {
+          return `[${dataBR}] TRANSFERÊNCIA\n${item.dadosExtras.textoTransferencia}\n`;
+        }
+        return `[${dataBR}] ${item.tipo}\nCategoria: ${item.categoria || ''}\nAparelho: ${item.nome || ''}\nIMEI: ${item.imei || ''}\nDetalhe: ${item.detalhe || ''}\nValores: À vista ${item.avista || ''} | 5x ${item.cinco || ''} | 10x ${item.dez || ''} | 18x ${item.dezoito || ''}\n`;
       }).join('\n------------------------------\n');
     }
 
     function copiarRelatorio() {
-      navigator.clipboard.writeText(relatorioHistorico.textContent).then(() => alert('Relatório copiado!'));
+      const t = relatorioHistorico.textContent;
+      if (!t || t.includes('Nenhum histórico')) { showToast('Nada para copiar.', 'warning'); return; }
+      navigator.clipboard.writeText(t).then(() => showToast('Relatório copiado!', 'success'));
     }
 
     function apagarHistoricoComSenha() {
       const senha = prompt('Digite a senha para apagar o histórico:');
-
-      if (senha !== '19021998') {
-        alert('Senha incorreta. O histórico não foi apagado.');
-        return;
-      }
-
+      if (senha === null) return;
+      if (senha !== '19021998') { showToast('Senha incorreta.', 'error'); return; }
       if (!confirm('Tem certeza que deseja apagar todo o histórico? Essa ação não pode ser desfeita.')) return;
-
       historico = [];
       salvarDados();
-      atualizarHistorico();
-      alert('Histórico apagado com sucesso!');
+      atualizarTela();
+      showToast('Histórico apagado.', 'info');
     }
 
     function limparTudo() {
+      if (aparelhos.length === 0) { showToast('Lista já está vazia.', 'info'); return; }
       if (!confirm('Deseja apagar todos os aparelhos cadastrados? O histórico será mantido.')) return;
-      aparelhos.forEach(aparelho => registrarHistorico('Exclusão', aparelho, 'Lista limpa pelo usuário'));
+      aparelhos.forEach(a => registrarHistorico('Exclusão', a, 'Lista limpa pelo usuário'));
       aparelhos = [];
       salvarDados();
       atualizarTela();
+      showToast('Lista limpa.', 'info');
     }
 
+    /* =================== BAIXAR PNG =================== */
     async function baixarTabelaPNG() {
-      document.getElementById('dataHoraPrint').innerText = `Gerado em: ${new Date().toLocaleString('pt-BR')}`;
+      if (aparelhos.length === 0) { showToast('Cadastre aparelhos antes de exportar.', 'warning'); return; }
+      document.getElementById('dataHoraPrint').innerText = `Gerado em ${new Date().toLocaleString('pt-BR')}`;
       const area = document.getElementById('areaTabelaPrint');
       const ocultar = area.querySelectorAll('.no-png');
-      ocultar.forEach(item => item.classList.add('hide-for-png'));
+      ocultar.forEach(i => i.classList.add('hide-for-png'));
 
       if (!window.html2canvas) {
         const script = document.createElement('script');
         script.src = 'https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js';
         document.body.appendChild(script);
-        await new Promise(resolve => script.onload = resolve);
+        await new Promise(r => script.onload = r);
       }
 
-      const canvas = await html2canvas(area, { scale: 2, backgroundColor: '#ffffff' });
-      ocultar.forEach(item => item.classList.remove('hide-for-png'));
-
-      const link = document.createElement('a');
-      link.download = 'tabela-aparelhos.png';
-      link.href = canvas.toDataURL('image/png');
-      link.click();
+      try {
+        const canvas = await html2canvas(area, { scale: 2, backgroundColor: '#ffffff' });
+        const link = document.createElement('a');
+        link.download = `tabela-aparelhos-${new Date().toISOString().slice(0,10)}.png`;
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+        showToast('Tabela exportada!', 'success');
+      } catch (err) {
+        showToast('Erro ao gerar PNG.', 'error');
+      } finally {
+        ocultar.forEach(i => i.classList.remove('hide-for-png'));
+      }
     }
 
+    /* =================== KEYBOARD =================== */
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        if (document.getElementById('modalPreviewVenda').classList.contains('active')) fecharPreviewVenda();
+        else if (document.getElementById('painelVenda').classList.contains('active')) fecharPainelVenda();
+      }
+    });
+
+    /* =================== INIT =================== */
+    aplicarNomeLoja();
     atualizarTela();
+
+    // se ainda não tiver nome de loja, abre o modal de setup
+    if (!getNomeLoja()) {
+      setTimeout(() => abrirModalLoja(), 250);
+    }
   </script>
 </body>
 </html>
