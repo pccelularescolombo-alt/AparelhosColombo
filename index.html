@@ -592,25 +592,25 @@
       const loja = localStorage.getItem('nomeLoja') || nomeLojaInput.value || 'Pinheirinho Celulares';
       const produto = `${aparelho.nome || ''} ${aparelho.armazenamento || ''} GB / ${aparelho.ram || ''} RAM${aparelho.observacao ? ' ' + aparelho.observacao : ''}`.trim();
 
-      const textoVenda = `*CLIENTE*: ${cliente}
+      const textoVenda = `CLIENTE: ${cliente}
 ` +
-                         `*CPF/CNPJ*: ${cpfCnpj}
+                         `CPF/CNPJ: ${cpfCnpj}
 ` +
-                         `*TELEFONE*: ${telefone}
+                         `TELEFONE: ${telefone}
 ` +
-                         `*DATA DA COMPRA*: ${dataCompra}
+                         `DATA DA COMPRA: ${dataCompra}
 ` +
-                         `*LOJA*: ${loja}
+                         `LOJA: ${loja}
 ` +
-                         `*PRODUTO*: ${produto}
+                         `PRODUTO: ${produto}
 ` +
-                         `*IMEI*: ${aparelho.imei || ''}
+                         `IMEI: ${aparelho.imei || ''}
 ` +
-                         `*VENDEDOR*: ${vendedor}
+                         `VENDEDOR: ${vendedor}
 ` +
-                         `*N° PEDIDO BLING*: ${pedidoBling}
+                         `N° PEDIDO BLING: ${pedidoBling}
 ` +
-                         `*N° CCB*: ${numeroCcb}`;
+                         `N° CCB: ${numeroCcb}`;
 
       const venda = { cliente, cpfCnpj, telefone, dataCompra, loja, produto, imei: aparelho.imei || '', vendedor, pedidoBling, numeroCcb, textoVenda };
 
@@ -665,19 +665,19 @@
 
       const produto = `${aparelho.nome || ''} ${aparelho.armazenamento || ''} GB / ${aparelho.ram || ''} RAM${aparelho.observacao ? ' ' + aparelho.observacao : ''}`.trim();
 
-      const textoTransferencia = `*LOJA ORIGEM*: ${lojaOrigem}
+      const textoTransferencia = `LOJA ORIGEM: ${lojaOrigem}
 ` +
-                                 `*LOJA DESTINO*: ${lojaTransferida}
+                                 `LOJA DESTINO: ${lojaTransferida}
 ` +
-                                 `*DATA*: ${dataTransferencia}
+                                 `DATA: ${dataTransferencia}
 ` +
-                                 `*PRODUTO*: ${produto}
+                                 `PRODUTO: ${produto}
 ` +
-                                 `*IMEI*: ${aparelho.imei || ''}
+                                 `IMEI: ${aparelho.imei || ''}
 ` +
-                                 `*VENDEDOR*: ${vendedor}
+                                 `VENDEDOR: ${vendedor}
 ` +
-                                 `*ENTREGADOR*: ${entregador}`;
+                                 `ENTREGADOR: ${entregador}`;
 
       const dadosTransferencia = {
         lojaOrigem,
