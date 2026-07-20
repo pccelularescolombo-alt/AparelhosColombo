@@ -13,6 +13,7 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
 <style>
 :root{
@@ -146,9 +147,9 @@ tbody tr:last-child td{border-bottom:none;}
 @media print{
   .col-acoes{display:none !important;}
   #btnAbrirCadastro{display:none !important;}
-  .btn-toggle-print{display:none !important;}
+  #btnCapturarTabela{display:none !important;}
 }
-.btn-toggle-print.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
 
 /* ===== PAINEL LATERAL ===== */
 .painel-overlay{position:fixed;inset:0;background:rgba(15,23,42,.45);z-index:90;opacity:0;pointer-events:none;transition:opacity .2s ease;}
@@ -313,7 +314,7 @@ tbody tr:last-child td{border-bottom:none;}
         <div class="table-toolbar">
           <button class="btn-accent" id="btnAbrirCadastro" onclick="toggleFormCadastro()"><i class="fa-solid fa-plus"></i> Cadastrar aparelho</button>
           <div class="pill"><i class="fa-solid fa-store" style="color:var(--accent);"></i> <span id="nomeLojaAtualTabela">Minha loja</span></div>
-          <button type="button" class="btn-ghost btn-toggle-print" id="btnModoPrint" onclick="toggleModoPrint()"><i class="fa-solid fa-camera"></i> Tirar print (ocultar ações)</button>
+          <button type="button" class="btn-ghost" id="btnCapturarTabela" onclick="capturarTabela()"><i class="fa-solid fa-camera"></i> Capturar tabela</button>
           <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="buscaAparelho" placeholder="Buscar por nome, IMEI, observação..." oninput="renderTabelaLojaAtual()" /></div>
         </div>
         <div id="chipsCategoria" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
@@ -566,20 +567,31 @@ window.addEventListener('beforeprint', ()=>{
   document.getElementById('wrapperTabelaLojaAtual')?.classList.add('modo-print');
 });
 window.addEventListener('afterprint', ()=>{
-  const wrap = document.getElementById('wrapperTabelaLojaAtual');
-  const btn = document.getElementById('btnModoPrint');
-  if (wrap && !wrap.dataset.printManual) wrap.classList.remove('modo-print');
+  document.getElementById('wrapperTabelaLojaAtual')?.classList.remove('modo-print');
 });
 
-function toggleModoPrint(){
+async function capturarTabela(){
   const wrap = document.getElementById('wrapperTabelaLojaAtual');
-  const btn = document.getElementById('btnModoPrint');
-  const ativo = wrap.classList.toggle('modo-print');
-  wrap.dataset.printManual = ativo ? '1' : '';
-  btn.classList.toggle('active', ativo);
-  btn.innerHTML = ativo
-    ? '<i class="fa-solid fa-eye"></i> Mostrar ações'
-    : '<i class="fa-solid fa-camera"></i> Tirar print (ocultar ações)';
+  const btn = document.getElementById('btnCapturarTabela');
+  if (!wrap) return;
+  const textoOriginal = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Capturando...';
+  wrap.classList.add('modo-print');
+  try{
+    const canvas = await html2canvas(wrap, { backgroundColor:'#ffffff', scale:2 });
+    const link = document.createElement('a');
+    link.download = `tabela-aparelhos-${formatarDataSP(new Date())}.png`;
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+    showToast('Imagem da tabela gerada com sucesso.','success');
+  }catch(err){
+    showToast('Erro ao capturar tabela: '+err.message,'error');
+  }finally{
+    wrap.classList.remove('modo-print');
+    btn.disabled = false;
+    btn.innerHTML = textoOriginal;
+  }
 }
 
 function showToast(msg, tipo='info'){
