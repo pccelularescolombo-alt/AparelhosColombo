@@ -132,6 +132,7 @@ tbody tr:last-child td{border-bottom:none;}
 .cat-novo{background:#DCFCE7;color:#15803D;} .cat-vitrine{background:#DBEAFE;color:#1D4ED8;}
 .cat-semi{background:#FEF3C7;color:#B45309;} .cat-outlet{background:#FCE7F3;color:#BE185D;}
 .cat-uso{background:#E0E7FF;color:#4338CA;} .cat-rastreio{background:#FEE2E2;color:#B91C1C;}
+.cat-lacrado{background:#CFFAFE;color:#0E7490;}
 .imei-cell{font-family:'JetBrains Mono',monospace;font-size:11.5px;color:var(--text-muted);}
 .price-cell{font-family:'JetBrains Mono',monospace;font-weight:700;font-size:12px;}
 .nfc-yes{color:var(--success);font-weight:700;} .nfc-no{color:var(--text-soft);}
@@ -236,16 +237,15 @@ tbody tr:last-child td{border-bottom:none;}
     </div>
 
     <div class="tabs">
-      <button class="tab-btn active" data-tab="cadastrar" onclick="mostrarAba('cadastrar')"><i class="fa-solid fa-plus"></i> Cadastrar</button>
-      <button class="tab-btn" data-tab="aparelhos" onclick="mostrarAba('aparelhos')"><i class="fa-solid fa-table-list"></i> Aparelhos</button>
+      <button class="tab-btn active" data-tab="aparelhos" onclick="mostrarAba('aparelhos')"><i class="fa-solid fa-table-list"></i> Aparelhos</button>
       <button class="tab-btn" data-tab="transferencias" onclick="mostrarAba('transferencias')"><i class="fa-solid fa-truck-fast"></i> Transferências <span id="badgeTransfPend" class="badge badge-warning hidden" style="margin-left:4px;"></span></button>
       <button class="tab-btn" data-tab="historico" onclick="mostrarAba('historico')"><i class="fa-solid fa-clock-rotate-left"></i> Histórico</button>
       <button class="tab-btn hidden" data-master-only data-tab="admin" onclick="mostrarAba('admin')"><i class="fa-solid fa-user-shield"></i> Administração</button>
     </div>
 
-    <!-- ===== ABA CADASTRAR ===== -->
-    <div class="tab-content active" id="tab-cadastrar">
-      <div class="card">
+    <!-- ===== ABA APARELHOS ===== -->
+    <div class="tab-content active" id="tab-aparelhos">
+      <div class="card hidden" id="cardCadastroAparelho">
         <h3 class="card-title"><i class="fa-solid fa-plus-circle"></i> Cadastrar novo aparelho</h3>
         <div class="field hidden" id="wrapLojaCadastro" style="margin-bottom:16px;max-width:320px;">
           <label>Loja de destino <span class="req">*</span></label>
@@ -282,6 +282,7 @@ tbody tr:last-child td{border-bottom:none;}
               <select id="categoria">
                 <option value="NOVO">NOVO</option><option value="NOVO DE VITRINE">NOVO DE VITRINE</option>
                 <option value="SEMI-NOVO">SEMI-NOVO</option><option value="OUTLET">OUTLET</option>
+                <option value="LACRADO">LACRADO</option>
                 <option value="USO LOJA">USO LOJA</option><option value="RASTREIO">RASTREIO</option>
               </select>
             </div>
@@ -293,16 +294,13 @@ tbody tr:last-child td{border-bottom:none;}
           </div>
           <div class="actions">
             <button type="submit" class="btn-primary"><i class="fa-solid fa-check"></i> Cadastrar aparelho</button>
-            <button type="reset" class="btn-ghost"><i class="fa-solid fa-rotate-left"></i> Limpar formulário</button>
+            <button type="button" class="btn-ghost" onclick="fecharFormCadastro()"><i class="fa-solid fa-xmark"></i> Fechar</button>
           </div>
         </form>
       </div>
-    </div>
-
-    <!-- ===== ABA APARELHOS ===== -->
-    <div class="tab-content" id="tab-aparelhos">
       <div class="card">
         <div class="table-toolbar">
+          <button class="btn-accent" id="btnAbrirCadastro" onclick="toggleFormCadastro()"><i class="fa-solid fa-plus"></i> Cadastrar aparelho</button>
           <div class="select-loja-wrap"><i class="fa-solid fa-store"></i> Ver loja: <select id="selectLojaVisualizada"></select></div>
           <div class="search-box"><i class="fa-solid fa-magnifying-glass"></i><input type="text" id="buscaAparelho" placeholder="Buscar por nome, IMEI, observação..." oninput="renderTabela()" /></div>
         </div>
@@ -400,6 +398,8 @@ tbody tr:last-child td{border-bottom:none;}
     <div class="field"><label>CPF / CNPJ <span class="req">*</span></label><input id="vendaCpfCnpj" type="text" /></div>
     <div class="field"><label>Telefone <span class="req">*</span></label><input id="vendaTelefone" type="text" /></div>
     <div class="field"><label>Vendedor <span class="req">*</span></label><input id="vendaVendedor" type="text" /></div>
+    <div class="field"><label>Número do pedido <span class="req">*</span></label><input id="vendaNumeroPedido" type="text" placeholder="Ex: 00123" /></div>
+    <div class="field"><label>Número da CCB</label><input id="vendaNumeroCcb" type="text" placeholder="Opcional" /></div>
     <div class="painel-actions">
       <button class="btn-primary" onclick="confirmarVenda()"><i class="fa-solid fa-check"></i> Salvar venda</button>
       <button class="btn-ghost" onclick="fecharPainel()">Cancelar</button>
@@ -448,6 +448,7 @@ tbody tr:last-child td{border-bottom:none;}
       <select id="editarCategoria">
         <option value="NOVO">NOVO</option><option value="NOVO DE VITRINE">NOVO DE VITRINE</option>
         <option value="SEMI-NOVO">SEMI-NOVO</option><option value="OUTLET">OUTLET</option>
+        <option value="LACRADO">LACRADO</option>
         <option value="USO LOJA">USO LOJA</option><option value="RASTREIO">RASTREIO</option>
       </select>
     </div>
@@ -502,8 +503,8 @@ let vendaDeviceId = null, transferenciaDeviceId = null, editarDeviceId = null;
 
 let unsubLojas = null, unsubDevices = null, unsubUsuarios = null, unsubRecebidas = null, unsubEnviadas = null;
 
-const CATEGORIAS = ['NOVO','NOVO DE VITRINE','SEMI-NOVO','OUTLET','USO LOJA','RASTREIO'];
-const categoriaClass = {'NOVO':'cat-novo','NOVO DE VITRINE':'cat-vitrine','SEMI-NOVO':'cat-semi','OUTLET':'cat-outlet','USO LOJA':'cat-uso','RASTREIO':'cat-rastreio'};
+const CATEGORIAS = ['NOVO','NOVO DE VITRINE','SEMI-NOVO','OUTLET','LACRADO','USO LOJA','RASTREIO'];
+const categoriaClass = {'NOVO':'cat-novo','NOVO DE VITRINE':'cat-vitrine','SEMI-NOVO':'cat-semi','OUTLET':'cat-outlet','LACRADO':'cat-lacrado','USO LOJA':'cat-uso','RASTREIO':'cat-rastreio'};
 
 /* =========================================================================
    HELPERS
@@ -575,6 +576,17 @@ function mostrarAbaAuth(nome){
 function mostrarAba(nome){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.toggle('active', b.dataset.tab===nome));
   document.querySelectorAll('.tab-content').forEach(c=>c.classList.toggle('active', c.id==='tab-'+nome));
+}
+
+function toggleFormCadastro(){
+  const card = document.getElementById('cardCadastroAparelho');
+  const abrindo = card.classList.contains('hidden');
+  card.classList.toggle('hidden');
+  if (abrindo) card.scrollIntoView({ behavior:'smooth', block:'start' });
+}
+function fecharFormCadastro(){
+  document.getElementById('cardCadastroAparelho').classList.add('hidden');
+  document.getElementById('formAparelho').reset();
 }
 
 function abrirPainel(boxId){
@@ -681,7 +693,7 @@ function iniciarListeners(){
   unsubLojas = db.collection('stores').onSnapshot(snap=>{
     lojasMap = {};
     snap.forEach(doc=> lojasMap[doc.id] = { id: doc.id, ...doc.data() });
-    if (!tabelaLojaId) tabelaLojaId = myStoreId || Object.keys(lojasMap)[0] || null;
+    if (!tabelaLojaId) tabelaLojaId = myStoreId || (Object.keys(lojasMap).length ? '__todas__' : null);
     atualizarSelectsLojas();
     atualizarPillLoja();
     renderTabelaLojasAdmin();
@@ -706,11 +718,17 @@ function atualizarPillLoja(){
 
 function atualizarSelectsLojas(){
   const ativos = Object.values(lojasMap).filter(l=>l.active!==false).sort((a,b)=>(a.name||'').localeCompare(b.name||''));
-  const opts = ativos.map(l=>`<option value="${l.id}">${escapeHtml(l.name)}</option>`).join('');
+  const minhaLoja = myStoreId ? ativos.find(l=>l.id===myStoreId) : null;
+  const outrasLojas = ativos.filter(l=>l.id!==myStoreId);
+
+  const optsVis = (minhaLoja ? `<option value="${minhaLoja.id}">${escapeHtml(minhaLoja.name)} (minha loja)</option>` : '')
+    + `<option value="__todas__">Todas as lojas</option>`
+    + outrasLojas.map(l=>`<option value="${l.id}">${escapeHtml(l.name)}</option>`).join('');
 
   const selVis = document.getElementById('selectLojaVisualizada');
-  if (selVis){ selVis.innerHTML = opts; selVis.value = tabelaLojaId || ''; }
+  if (selVis){ selVis.innerHTML = optsVis; selVis.value = tabelaLojaId || (minhaLoja ? minhaLoja.id : '__todas__'); }
 
+  const opts = ativos.map(l=>`<option value="${l.id}">${escapeHtml(l.name)}</option>`).join('');
   const selCad = document.getElementById('selectLojaCadastro');
   if (selCad){ selCad.innerHTML = `<option value="">— Selecione a loja —</option>` + opts; }
 
@@ -755,7 +773,7 @@ document.getElementById('formAparelho').addEventListener('submit', async e=>{
   try{
     await db.collection('devices').add(dados);
     await registrarHistorico([lojaAlvo], 'Cadastro', dados, `Aparelho cadastrado: ${nome}`);
-    document.getElementById('formAparelho').reset();
+    fecharFormCadastro();
     showToast('Aparelho cadastrado!','success');
   }catch(err){ showToast('Erro ao cadastrar: '+err.message,'error'); }
 });
@@ -767,14 +785,19 @@ function iniciarListenerAparelhos(){
   if (unsubDevices) unsubDevices();
   if (!tabelaLojaId){
     devicesCache = [];
+    renderChipsCategoria();
     renderTabela();
     atualizarStats();
     return;
   }
-  unsubDevices = db.collection('devices').where('storeId','==', tabelaLojaId)
+  const query = tabelaLojaId === '__todas__'
+    ? db.collection('devices')
+    : db.collection('devices').where('storeId','==', tabelaLojaId);
+  unsubDevices = query
     .onSnapshot(snap=>{
       devicesCache = [];
       snap.forEach(doc=> devicesCache.push({ id: doc.id, ...doc.data() }));
+      renderChipsCategoria();
       renderTabela();
       atualizarStats();
     }, err=>showToast('Erro ao carregar aparelhos: '+err.message,'error'));
@@ -782,9 +805,13 @@ function iniciarListenerAparelhos(){
 
 function renderChipsCategoria(){
   const cont = document.getElementById('chipsCategoria');
-  const cats = ['Todas', ...CATEGORIAS];
+  if (!cont) return;
+  const mostrarVendidosAtivo = document.getElementById('chipVendidos')?.classList.contains('active') || false;
+  const presentes = CATEGORIAS.filter(c => devicesCache.some(d=>d.categoria===c));
+  if (filtroCategoriaAtivo !== 'Todas' && !presentes.includes(filtroCategoriaAtivo)) filtroCategoriaAtivo = 'Todas';
+  const cats = ['Todas', ...presentes];
   cont.innerHTML = cats.map(c=>`<button type="button" class="filter-chip ${filtroCategoriaAtivo===c?'active':''}" onclick="filtrarCategoria('${c}')">${c}</button>`).join('')
-    + `<button type="button" id="chipVendidos" class="filter-chip" onclick="toggleChipVendidos(this)"><i class="fa-solid fa-eye"></i> Mostrar vendidos</button>`;
+    + `<button type="button" id="chipVendidos" class="filter-chip ${mostrarVendidosAtivo?'active':''}" onclick="toggleChipVendidos(this)"><i class="fa-solid fa-eye"></i> Mostrar vendidos</button>`;
 }
 function filtrarCategoria(c){ filtroCategoriaAtivo=c; renderChipsCategoria(); renderTabela(); }
 function toggleChipVendidos(btn){ btn.classList.toggle('active'); renderTabela(); }
@@ -792,7 +819,6 @@ function toggleChipVendidos(btn){ btn.classList.toggle('active'); renderTabela()
 function renderTabela(){
   const busca = (document.getElementById('buscaAparelho')?.value||'').toLowerCase().trim();
   const mostrarVendidos = document.getElementById('chipVendidos')?.classList.contains('active');
-  const podeEditar = isMasterUser || (tabelaLojaId && tabelaLojaId === myStoreId);
 
   let lista = devicesCache.filter(d=>{
     if (!mostrarVendidos && d.status==='vendido') return false;
@@ -811,6 +837,7 @@ function renderTabela(){
   }
 
   tbody.innerHTML = lista.map(d=>{
+    const podeEditar = isMasterUser || d.storeId === myStoreId;
     const statusBadge = d.status==='vendido' ? '<span class="badge badge-muted">Vendido</span>'
       : d.status==='transfer_pendente' ? '<span class="badge badge-warning">Transf. pendente</span>'
       : '<span class="badge badge-success">Disponível</span>';
@@ -884,17 +911,18 @@ async function registrarHistorico(visibleTo, tipo, deviceSnapshot, detalhe, extr
    ========================================================================= */
 function abrirVenda(deviceId){
   vendaDeviceId = deviceId;
-  ['vendaCliente','vendaCpfCnpj','vendaTelefone','vendaVendedor'].forEach(id=>document.getElementById(id).value='');
+  ['vendaCliente','vendaCpfCnpj','vendaTelefone','vendaVendedor','vendaNumeroPedido','vendaNumeroCcb'].forEach(id=>document.getElementById(id).value='');
   abrirPainel('boxVenda');
 }
 async function confirmarVenda(){
   const d = devicesCache.find(x=>x.id===vendaDeviceId);
   if (!d) return;
-  const cliente=valor('vendaCliente'), cpf=valor('vendaCpfCnpj'), tel=valor('vendaTelefone'), vendedor=valor('vendaVendedor');
-  if (!cliente||!cpf||!tel||!vendedor){ showToast('Preencha todos os campos obrigatórios.','warning'); return; }
+  const cliente=valor('vendaCliente'), cpf=valor('vendaCpfCnpj'), tel=valor('vendaTelefone'), vendedor=valor('vendaVendedor'),
+        numeroPedido=valor('vendaNumeroPedido'), numeroCcb=valor('vendaNumeroCcb');
+  if (!cliente||!cpf||!tel||!vendedor||!numeroPedido){ showToast('Preencha todos os campos obrigatórios.','warning'); return; }
   try{
     await db.collection('devices').doc(d.id).update({ status:'vendido', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await registrarHistorico([d.storeId], 'Venda', d, `Vendido para ${cliente} (CPF/CNPJ ${cpf}) pelo vendedor ${vendedor}`, { cliente, cpf, telefone: tel, vendedor });
+    await registrarHistorico([d.storeId], 'Venda', d, `Vendido para ${cliente} (CPF/CNPJ ${cpf}) pelo vendedor ${vendedor} · Pedido nº ${numeroPedido}${numeroCcb?` · CCB nº ${numeroCcb}`:''}`, { cliente, cpf, telefone: tel, vendedor, numeroPedido, numeroCcb });
     fecharPainel();
     showToast('Venda registrada!','success');
   }catch(err){ showToast('Erro: '+err.message,'error'); }
