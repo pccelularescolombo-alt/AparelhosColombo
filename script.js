@@ -56,6 +56,14 @@ function formatarDataSP(date){
   partes.forEach(p=>obj[p.type]=p.value);
   return `${obj.year}-${obj.month}-${obj.day}`;
 }
+function formatarDataSomenteSP(date){
+  return new Intl.DateTimeFormat('pt-BR', {
+    timeZone: 'America/Sao_Paulo', day:'2-digit', month:'2-digit', year:'numeric'
+  }).format(date);
+}
+function formatarProdutoDetalhe(d){
+  return [d.categoria, d.nome, d.armazenamento, d.ram, d.garantia].filter(Boolean).join(' ');
+}
 function valor(id){ const el=document.getElementById(id); return el ? el.value.trim() : ''; }
 function escapeHtml(s){ return String(s??'').replace(/[&<>"']/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
 function buscarDevice(id){ return devicesCache.find(x=>x.id===id) || devicesCacheTodas.find(x=>x.id===id); }
@@ -582,7 +590,8 @@ async function registrarHistorico(visibleTo, tipo, deviceSnapshot, detalhe, extr
     visibleTo, tipo, detalhe,
     device: {
       nome: deviceSnapshot.nome||'', imei: deviceSnapshot.imei||'', categoria: deviceSnapshot.categoria||'',
-      garantia: deviceSnapshot.garantia||'', avista: deviceSnapshot.avista||'', cinco: deviceSnapshot.cinco||'',
+      garantia: deviceSnapshot.garantia||'', armazenamento: deviceSnapshot.armazenamento||'', ram: deviceSnapshot.ram||'',
+      avista: deviceSnapshot.avista||'', cinco: deviceSnapshot.cinco||'',
       dez: deviceSnapshot.dez||'', dezoito: deviceSnapshot.dezoito||''
     },
     extra,
@@ -607,7 +616,11 @@ async function confirmarVenda(){
   if (!cliente||!cpf||!tel||!vendedor||!numeroPedido){ showToast('Preencha todos os campos obrigatórios.','warning'); return; }
   try{
     await db.collection('devices').doc(d.id).update({ status:'vendido', updatedAt: firebase.firestore.FieldValue.serverTimestamp() });
-    await registrarHistorico([d.storeId], 'Venda', d, `Vendido para ${cliente} (CPF/CNPJ ${cpf}) pelo vendedor ${vendedor} · Pedido nº ${numeroPedido}${numeroCcb?` · CCB nº ${numeroCcb}`:''}`, { cliente, cpf, telefone: tel, vendedor, numeroPedido, numeroCcb });
+    const nomeLoja = lojasMap[d.storeId]?.name || '';
+    const produtoStr = formatarProdutoDetalhe(d);
+    const dataCompra = formatarDataSomenteSP(new Date());
+    const detalhe = `CLIENTE: ${cliente}\nCPF/CNPJ: ${cpf}\nTELEFONE: ${tel}\nDATA DA COMPRA: ${dataCompra}\nLOJA: ${nomeLoja}\nPRODUTO: ${produtoStr}\nIMEI: ${d.imei||'—'}\nVENDEDOR: ${vendedor}\nN° PEDIDO BLING: ${numeroPedido}\nN° CCB: ${numeroCcb || '—'}`;
+    await registrarHistorico([d.storeId], 'Venda', d, detalhe, { cliente, cpf, telefone: tel, vendedor, numeroPedido, numeroCcb });
     fecharPainel();
     showToast('Venda registrada!','success');
   }catch(err){ showToast('Erro: '+err.message,'error'); }
@@ -637,9 +650,10 @@ async function confirmarTransferencia(){
   const originStoreId = d.storeId;
   try{
     const transferRef = db.collection('transfers').doc();
+    const agora = new Date();
     await transferRef.set({
       deviceId: d.id,
-      deviceSnapshot: { nome:d.nome||'', imei:d.imei||'', categoria:d.categoria||'', garantia:d.garantia||'' },
+      deviceSnapshot: { nome:d.nome||'', imei:d.imei||'', categoria:d.categoria||'', garantia:d.garantia||'', armazenamento:d.armazenamento||'', ram:d.ram||'' },
       originStoreId, originStoreName: lojasMap[originStoreId]?.name||'',
       destStoreId, destStoreName: lojasMap[destStoreId]?.name||'',
       vendedor, entregador, status:'pendente',
@@ -650,7 +664,9 @@ async function confirmarTransferencia(){
       status:'transfer_pendente', pendingDestStoreId: destStoreId, pendingTransferId: transferRef.id,
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
-    await registrarHistorico([originStoreId], 'Transferência solicitada', d, `Solicitada transferência para ${lojasMap[destStoreId]?.name||''} (vendedor: ${vendedor}, entregador: ${entregador})`);
+    const produtoStr = formatarProdutoDetalhe(d);
+    const detalhe = `TRANSFERÊNCIA ${formatarDataHoraSP(agora)}\nLOJA ATUAL: ${lojasMap[originStoreId]?.name||''}\nLOJA DESTINO: ${lojasMap[destStoreId]?.name||''}\nPRODUTO: ${produtoStr}\nIMEI: ${d.imei||'—'}\nVENDEDOR: ${vendedor}\nENTREGADOR: ${entregador}`;
+    await registrarHistorico([originStoreId], 'Transferência solicitada', d, detalhe);
     fecharPainel();
     showToast('Transferência solicitada! Aguardando aprovação da loja destino.','success');
   }catch(err){ showToast('Erro: '+err.message,'error'); }
@@ -682,8 +698,9 @@ async function aprovarTransferencia(transferId){
       updatedAt: firebase.firestore.FieldValue.serverTimestamp()
     });
     await tRef.update({ status:'aprovada', respondedAt: firebase.firestore.FieldValue.serverTimestamp(), respondedByUid: currentUser.uid });
-    await registrarHistorico([t.originStoreId], 'Transferência aprovada', t.deviceSnapshot, `${t.destStoreName} confirmou o recebimento do aparelho.`);
-    await registrarHistorico([t.destStoreId], 'Transferência recebida', t.deviceSnapshot, `Aparelho recebido de ${t.originStoreName}.`);
+    const produtoStr = formatarProdutoDetalhe(t.deviceSnapshot||{});
+    const detalhe = `ADICIONADO:\nTRANSFERÊNCIA ${formatarDataHoraSP(new Date())}\nLOJA ATUAL: ${t.originStoreName||''}\nLOJA DESTINO: ${t.destStoreName||''}\nPRODUTO: ${produtoStr}\nIMEI: ${t.deviceSnapshot?.imei||'—'}\nVENDEDOR: ${t.vendedor||''}\nENTREGADOR: ${t.entregador||''}`;
+    await registrarHistorico([t.originStoreId, t.destStoreId], 'Transferência aprovada', t.deviceSnapshot, detalhe);
     showToast('Transferência aprovada!','success');
   }catch(err){ showToast('Erro: '+err.message,'error'); }
 }
@@ -883,9 +900,12 @@ function renderHistorico(){
     return;
   }
   box.className = 'relatorio-box';
+  const tiposComDetalheCompleto = ['Venda','Transferência solicitada','Transferência aprovada'];
   box.textContent = filtrado.map(h=>{
     const dataBR = h.createdAt?.toDate ? formatarDataHoraSP(h.createdAt.toDate()) : '—';
-    return `[${dataBR}] ${h.tipo}\nAparelho: ${h.device?.nome||''} | IMEI: ${h.device?.imei||''}\nDetalhe: ${h.detalhe||''}\nUsuário: ${h.userEmail||''}\n`;
+    const linhaAparelho = tiposComDetalheCompleto.includes(h.tipo) ? '' : `Aparelho: ${h.device?.nome||''} | IMEI: ${h.device?.imei||''}\n`;
+    const linhaUsuario = isMasterUser ? `\nUsuário: ${h.userEmail||''}` : '';
+    return `[${dataBR}] ${h.tipo}\n${linhaAparelho}${h.detalhe||''}${linhaUsuario}\n`;
   }).join('\n------------------------------\n');
 }
 
